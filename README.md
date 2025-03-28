@@ -1,21 +1,32 @@
-# mdtool
+# MD 轨迹分析脚本
+## 密度分布
 
-## 1. Overview
+## 氢键
 
-tools for md or dft
+### 单个水分子
 
-## 2. Usage
+### 氢键分布
 
-### 2.1 init project
+## 角度
 
-```bash
-poetry install -v
-```
+### 与表面法向量夹角分布
 
-### 2.2 usage
+### ion - O - ion 夹角分布
 
-TODO
+### $\cos \phi \rho_{H_2 O}$ 分布
 
-## 3. Develop
+## RDF
 
-You may need to read the [develop document](./docs/development.md) to use SRC Layout in your IDE.
+## 位置归一化
+
+# DFT 性质分析脚本
+## PDOS
+
+## 静电势
+
+## 电荷差分
+
+# 其他
+## 轨迹提取
+
+## 数据处理

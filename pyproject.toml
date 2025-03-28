@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "mdtool"
-version = "0.1.0"
+version = "0.1.4"
 description = "tools for md or dft"
 readme = "README.md"
 authors = ["jxxcr <jixxcr@qq.com>"]
@@ -26,7 +26,8 @@ pytest-pylint = "^0.19.0"
 pre-commit = "^3.3.2"
 
 [tool.poetry.scripts]
-mdtool = "mdtool.cmdline:main"
+extract = "mdtool.extract:main"
+convert = "mdtool.convert:main"
 
 [build-system]
 requires = ["poetry-core"]
