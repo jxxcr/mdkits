@@ -2,8 +2,8 @@
 
 # extract final structure form pos.xyz file
 
-import argparse
 import os, sys
+import click
 from mdtool.util import structure_parsing, os_operation
 
 
@@ -31,6 +31,9 @@ def parse_argument():
     return parser.parse_args()
 
 
+@click.command(name='extract')
+@click.option('-i', '--input_file_name', type=str, help='input file name', default=os_operation.default_file_name('*-pos-1.xyz', last=True))
+@click.option('-o', '--output_file_name', type=str, help='output file name, default is "out.xyz"', default='extracted.xyz')
 def main():
     args = parse_argument()
     if args.input_file_name == None:
