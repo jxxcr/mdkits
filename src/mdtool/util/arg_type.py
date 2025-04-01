@@ -21,4 +21,21 @@ class CellType(click.ParamType):
                 self.fail(f"{value} is not a valid cell parameter", param, ctx)
 
 
+class FrameRangeType(click.ParamType):
+    name = "frame range"
+    def convert(self, value, param, ctx):
+        if isinstance(value, str):
+            parts = value.split(':')
+            if len(parts) < 3:
+                parts.append('')
+
+            range_list = [int(x) if x else None for x in parts]
+
+            if len(range_list) > 0 and len(range_list) <= 3:
+                return range_list
+            else:
+                self.fail(f"{value} is not a valid frame range", param, ctx)
+
+
 Cell = CellType()
+FrameRange = FrameRangeType()

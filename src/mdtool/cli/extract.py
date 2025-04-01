@@ -2,66 +2,68 @@
 
 # extract final structure form pos.xyz file
 
-import os, sys
+import os
 import click
-from mdtool.util import structure_parsing, os_operation
+from mdtool.util import os_operation, arg_type
+import MDAnalysis
+from MDAnalysis import Universe
 
 
-def parse_range(s):
-    range_list = [int(x) for x in s.split(':')]
-    if len(range_list) == 1:
-        range_list.append(range_list[0]+1)
-        range_list.append(None)
-    if len(range_list) == 2:
-        range_list.append(None)
-    return slice(range_list[0], range_list[1], range_list[2])
+def write_to_xyz(u, frames, o, cut=None):
+    with MDAnalysis.Writer(o, u.atoms.n_atoms, format='XYZ') as w:
+        for ts in u.trajectory:
+            if ts.frame in frames:
+                w.write(u)
+    if cut:
+        with open(o, 'r') as fi, open(o+'t', 'w') as fo:
+            for i, line in enumerate(fi):
+                if i >= cut:
+                    fo.write(line)
+        os.replace(o+'t', o)
 
 
-
-# set argument
-def parse_argument():
-    parser = argparse.ArgumentParser(description='extract pos file from output file')
-
-    parser.add_argument('input_file_name', type=str, nargs='?', help='input file name', default=os_operation.default_file_name('*-pos-1.xyz', last=True))
-    parser.add_argument('-o', type=str, help='output file name, default is "out.xyz"', default='extracted.xyz')
-    parser.add_argument('-r', type=parse_range, help='list range', default=slice(-1, None, None))
-    parser.add_argument('-c', help='output a coord.xyz', action='store_true')
-    parser.add_argument('-s', type=int, help='separated output', default=None)
-
-    return parser.parse_args()
-
+def write_to_xyz_s(u, frames, cut=None):
+    index = 0
+    for ts in u.trajectory:
+        if ts.frame in frames:
+            o = f'./coord/coord_{index:03d}'
+            with MDAnalysis.Writer(o, u.atoms.n_atoms, format='XYZ') as w:
+                w.write(u)
+                index += 1
+            if cut:
+                with open(o, 'r') as fi, open(o+'t', 'w') as fo:
+                    for i, line in enumerate(fi):
+                        if i >= cut:
+                            fo.write(line)
+                os.replace(o+'t', o)
 
 @click.command(name='extract')
-@click.option('-i', '--input_file_name', type=str, help='input file name', default=os_operation.default_file_name('*-pos-1.xyz', last=True))
-@click.option('-o', '--output_file_name', type=str, help='output file name, default is "out.xyz"', default='extracted.xyz')
-def main():
-    args = parse_argument()
-    if args.input_file_name == None:
-        print('give a xyz file')
-        sys.exit()
-    groups = structure_parsing.xyz_to_groups(args.input_file_name)
-    print(f"total frame is {len(groups)}")
-    sliced_groups = groups[args.r]
+@click.argument('input_file_name', type=click.Path(exists=True), default=os_operation.default_file_name('*-pos-1.xyz', last=True))
+@click.option('-o', type=str, help='output file name', default='extracted.xyz', show_default=True)
+@click.option('-r', type=arg_type.FrameRange, help='frame range to slice', default='-1', show_default=True)
+@click.option('-c', help='output a coord.xyz', is_flag=True)
+def main(input_file_name, o, r, c):
+    u = Universe(input_file_name)
+    group = u.trajectory[slice(*r)]
+    frames = [ts.frame for ts in group]
 
-    if args.s:
-        sliced_groups = groups[1::args.s]
+    if c:
+        cut = 2
+    else:
+        cut = None
+
+    if len(r) == 3 and r[-1] is not None:
         if not os.path.exists('./coord'):
             os.makedirs('./coord')
         else:
             import shutil
             shutil.rmtree('./coord')
             os.makedirs('./coord')
-        for index, group in enumerate(sliced_groups):
-            if args.c:
-                structure_parsing.group_to_xyz(f'./coord/coord_{index:03d}', group, cut=2)
-            else:
-                structure_parsing.group_to_xyz(f'./coord/coord_{index:03d}', group)
+        write_to_xyz_s(u, frames, cut=cut)
     else:
-        if args.c:
-            structure_parsing.groups_to_xyz(args.o, sliced_groups, cut=2)
-        else:
-            structure_parsing.groups_to_xyz(args.o, sliced_groups)
-        print(os.path.abspath(args.o))
+        write_to_xyz(u, frames, o, cut=cut)
+
+        click.echo(os.path.abspath(o))
 
 
 if __name__ == '__main__':
