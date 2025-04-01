@@ -45,6 +45,7 @@ def write_to_xyz_s(u, frames, cut=None):
 def main(input_file_name, o, r, c):
     u = Universe(input_file_name)
     group = u.trajectory[slice(*r)]
+    click.echo(f"total frames is {len(u.trajectory)}")
     frames = [ts.frame for ts in group]
 
     if c:
