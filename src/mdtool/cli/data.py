@@ -12,8 +12,8 @@ def match_file(patch):
     return match_file
 
 
-@click.command()
-@click.argument('filename', type=click.Path(exists=True))
+@click.command(name='data')
+@click.argument('filename', nargs=-1, type=click.Path(exists=True))
 @click.option('--nor', help='normalized data', is_flag=True)
 @click.option('--gaus', type=int, help='gaussian filter 1d data', default=0)
 @click.option('--fold', help='fold and average', is_flag=True)

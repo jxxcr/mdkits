@@ -3,6 +3,7 @@ from mdtool.cli import (
     convert,
     wrap,
     extract,
+    data,
 )
 
 
@@ -16,6 +17,7 @@ def cli(ctx):
 cli.add_command(convert.main)
 cli.add_command(wrap.main)
 cli.add_command(extract.main)
+cli.add_command(data.main)
 
 
 if __name__ == '__main__':
