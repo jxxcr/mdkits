@@ -96,3 +96,23 @@ def unwrap(atom1, atom2, coefficients, max=0, total=False):
         return min_dist, closest_point
 
 
+def find_surface(surface_group:np.ndarray, layer_tolerance=1, surface_tolerance=5):
+    sort_group = surface_group.sort()
+    layer_mean = []
+    current_layer = [sort_group[0]]
+    for i in range(1, len(sort_group)):
+        if abs(sort_group[i] - sort_group[i-1]) < layer_tolerance:
+            current_layer.append(sort_group[i])
+        else:
+            layer_mean.append(np.mean(current_layer))
+            current_layer = [sort_group[i]]
+    
+    if len(current_layer) == 1:
+        return layer_mean[0]
+
+    diff = np.diff(layer_mean)
+    if np.any(diff > surface_tolerance):
+        index = np.argmax(diff > 5)
+        return (layer_mean[index], layer_mean[index + 1])
+    else:
+        return layer_mean[-1]

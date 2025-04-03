@@ -74,5 +74,60 @@ mdtool convert -c structure.cif -o structure_xyz
 1. `--nor`: 对数据进行归一化处理
 2. `--gaus`: 对数据进行高斯过滤
 3. `--fold`: 堆数据进行折叠平均
-4. `err`: 计算数据的误差棒
+4. `--err`: 计算数据的误差棒
 等
+
+### 绘图工具
+`plot`用于绘制数据图, `plot`需要读取`yaml`格式的配置文件进行绘图, `yaml`文件的形式如下:
+```yaml
+# plot mode 1
+figure1:
+  data:
+    legend1: ./data1.dat
+    legend2: ./data2.dat
+  x:
+    0: x-axis
+  y:
+    1: y-axis
+  x_range: 
+    - 5
+    - 15
+
+# plot mode 2
+figure2:
+  data:
+    y-xais: ./data.dat
+  x:
+    0: x-axis
+  y:
+    1: legend1
+    2: legend2
+    3: legend3
+    4: legend4
+    5: legend5
+  y_range:
+    - 0.5
+    - 6
+  legend_fontsize: 12
+
+# plot mode error
+12_dp_e_error:
+  data:
+    legend: ./error.dat
+  x:
+    0: x-axis
+  y:
+    1: y-axis
+  fold: dp
+  legend_fontsize: 12
+```
+如上`plot`支持三种绘图模式, `mode 1`, `mode 2`和`mode error`. `mode 1`用于绘制多组数据文件的同一列数据对比, `mode 2`用于绘制同一数据文件的不同列数据对比, `mode error`用于绘制均方根误差图.
+
+`plot`可以同时处理多个`yaml`文件, 每个`yaml`文件可以包含多个绘图配置, `mode 1`和`mode 2`的绘图配置可以自动识别, 但是`error`模式需要而外指定, 如:
+```bash
+mdtool plot *.yaml
+```
+和:
+```bash
+mdtool plot *.yaml --error
+```

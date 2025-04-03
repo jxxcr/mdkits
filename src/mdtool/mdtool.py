@@ -4,6 +4,7 @@ from mdtool.cli import (
     wrap,
     extract,
     data,
+    plot,
 )
 
 
@@ -18,6 +19,7 @@ cli.add_command(convert.main)
 cli.add_command(wrap.main)
 cli.add_command(extract.main)
 cli.add_command(data.main)
+cli.add_command(plot.main)
 
 
 if __name__ == '__main__':

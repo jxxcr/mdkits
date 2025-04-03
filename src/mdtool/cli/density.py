@@ -1,110 +1,89 @@
 #!/usr/bin/env python3
 
-import os, sys, argparse
 import numpy as np
-import math
-import multiprocessing
-from util import (
-    structure_parsing,
-    cp2k_input_parsing,
-    os_operation
-    )
+import click
+import MDAnalysis
+from MDAnalysis import Universe
+from MDAnalysis.analysis.base import AnalysisBase
+from mdtool.util import cp2k_input_parsing, numpy_geo, encapsulated_mda
+import warnings
+warnings.filterwarnings("ignore")
 
 
-def atom_number_count(chunk, bin_size, z_lenth, atom_name, filename):
-    bin_number = math.ceil(float(z_lenth) / bin_size)+2
-    groups = structure_parsing.chunk_to_groups(chunk)
-    groups_array_list = []
-    for group in groups:
-        group_array = np.zeros((1, bin_number))
-        for atom in group[2:]:
-            o_atom = atom.split()
-            if o_atom[0] == atom_name:
-            #if (o_atom := atom.split())[0] == atom_name:
-                o_z = float(o_atom[-1])
-                group_array[0, int(math.floor(o_z/bin_size))] += 1
-        groups_array_list.append(group_array)
-    groups_array = np.vstack(groups_array_list)
-    chunk_array = np.mean(groups_array, axis=0).reshape(1, -1)
-    np.save(filename, chunk_array)
+class Density_distribution(AnalysisBase):
+    def __init__(self, filename, cell, o, distance_judg, angle_judg, dt=0.001, bin_size=0.2, return_index=False):
+        u = Universe(filename)
+        u.trajectory.ts.dt = dt
+        u.dimensions = cell
 
+        self.u = u
+        self.o = o
+        self.distance_judg = distance_judg
+        self.angle_judg = angle_judg
+        self.atomgroup = u.select_atoms("all")
+        self.mid_z = u.dimensions[2]/2
+        self.bin_size = bin_size
+        self.frame_count = 0
+        self.return_index = return_index
 
-def array_type(string):
-	number_list = string.split(',')
-	number_array = array(number_list, dtype=float)
-	return number_array
+        super(Density_distribution, self).__init__(self.atomgroup.universe.trajectory, verbose=True)
 
+    def _prepare(self):
+        self.bin_num = int(self.u.dimensions[2] / self.bin_size) + 2
+        self.density_distribution = np.zeros(self.bin_num, dtype=np.float64)
+        if self.surface:
+            self.surface_pos = ()
 
-def get_cell(cp2k_input_file, cell=None):
-    if cell is None:
-        cell = cp2k_input_parsing.parse_cell(cp2k_input_file)
-    else:
-        cell = cell
-        if len(cell) == 3:
-            cell.extend([90.0, 90.0, 90.0])
+    def _append(self, z):
+        bins = np.floor(z / self.bin_size).astype(int) + 1
+        np.add.at(self.density_distribution, bins, 1)
 
-    return cell
+    def _single_frame(self):
+        if self.water:
+            o_group = self.atomgroup.select_atoms("name O")
+            h_group = self.atomgroup.select_atoms("name H")
 
+            o, oh1, oh2 = encapsulated_mda.update_water(self, o_group, h_group, distance_judg=self.distance_judg, angle_judg=self.angle_judg, return_index=self.return_index)
 
-def parse_cell(s):
-    if s == None:
-        return None
-    return [float(x) for x in s.replace(',', ' ').split()]
+            self._append(o.positions[:, 2])
 
+        else:
+            group = self.atomgroup.select_atoms(f"name {self.element}")
+            self._append(group.positions[:, 2])
 
-# set argument
-def parse_argument():
-    parser = argparse.ArgumentParser(description='calculate water density destribution alone z axis')
+        self.
+        self.frame_count += 1
 
-    parser.add_argument('input_file_name', type=str, nargs='?', help='input file name', default=os_operation.default_file_name('*-pos-1.xyz', last=True))
-    #parser.add_argument('-a', type=str, help='atom to statistic', default='O')
-    parser.add_argument('-o', type=str, help='output file name, default is "density.dat"', default='density.dat')
-    parser.add_argument('-r', type=array_type, help='bulk range')
-    parser.add_argument('--cp2k_input_file', type=str, help='input file name of cp2k, default is "input.inp"', default='input.inp')
-    parser.add_argument('--cell', type=parse_cell, help='set cell, a list of lattice, [x,y,z] or [x,y,z,a,b,c]')
-    parser.add_argument('--process', type=int, help='paralle process number default is 28', default=28)
-    parser.add_argument('--temp', help='keep temp file', action='store_false')
+    def _conclude(self):
+        if self.frame_count > 0:
+            V = self.u.dimensions[0] * self.u.dimensions[1] * self.bin_size
 
-    return parser.parse_args()
+            if self.water:
+                density_distribution = (self.density_distribution * (15.999+1.008*2) * 1.660539 / V) / self.frame_count
+            else:
+                density_distribution = (self.density_distribution * (10000/6.02) / V) / self.frame_count
 
+            bins_z = np.arange(len(self.density_distribution)) * self.bin_size
 
-def main():
-    args = parse_argument()
-    bin_size = 0.2
-    cell = get_cell(args.cp2k_input_file, args.cell)
-    print(cell)
-    temp_dir = f'{os.environ.get("TEMP_DIR")}/{os.getpid()}'
-    os_operation.make_temp_dir(temp_dir, delete=args.temp)
-    chunks = structure_parsing.xyz_to_chunks(args.input_file_name, args.process)
-    group = structure_parsing.chunk_to_groups(chunks[0])[0]
-    atom_names = structure_parsing.atom_name_parse(group)
-    V = cell[0] * cell[1] * math.sin(math.radians(cell[-1])) * bin_size
-    for atom_name in atom_names:
-        for index, chunk in enumerate(chunks):
-            t = multiprocessing.Process(target=atom_number_count, args=[chunk, bin_size, cell[2], atom_name, f'{temp_dir}/chunk_{index}.temp'])
-            t.start()
+            surface = self.find_surface(self.atomgroup.select_atoms("name Pt"))
 
-        for t in multiprocessing.active_children():
-            t.join()
+            lower_z, upper_z = surface
+            mask = (bins_z >= lower_z) & (bins_z <= upper_z)
+            filtered_bins_z = bins_z[mask] - lower_z
+            filtered_density_distribution = density_distribution[mask]
+            conbined_data = np.column_stack((filtered_bins_z, filtered_density_distribution))
 
-        chunks_array_list = []
-        for i in range(len(chunks)):
-            chunk_array = np.load(f'{temp_dir}/chunk_{i}.temp.npy')
-            chunks_array_list.append(chunk_array)
-        chunks_array = np.vstack(chunks_array_list)
-        chunks_array = np.mean(chunks_array, axis=0)
-        if atom_name == 'O':
-            chunks_array = chunks_array * (15.999+1.0080*2) * 1.660539 / V
-            with open(f'density_water.dat', 'w') as f:
-                for i in range(len(chunks_array)):
-                    f.write(str((i+1)*bin_size) + '\t' + str(chunks_array[i]) + '\n')
+            np.savetxt(self.o, conbined_data, header="Z\tdensity", fmt='%.5f', delimiter='\t')
 
-        chunks_array = chunks_array * (10000/6.02) / V
-        with open(f'density_{atom_name}.dat', 'w') as f:
-            for i in range(len(chunks_array)):
-                f.write(str((i+1)*bin_size) + '\t' + str(chunks_array[i]) + '\n')
+@click.command(name='density')
+@click.argument('filename', type=click.Path(exists=True), default=os_operation.default_file_name('*-pos-1.xyz', last=True))
+@click.option('--cell', type=arg_type.Cell, help='set xyz file cell, --cell x,y,z,a,b,c')
+@click.option('--cell', type=arg_type.Cell, help='set cell from cp2k input file or a list of lattice: --cell x,y,z or x,y,z,a,b,c', default='input.inp', show_default=True)
+@click.option('-o', type=str, help='output file name', default='density.dat', show_default=True)
+def main(filename, cell, o):
+    density_dist = Density_distribution(filename, cell, o=o)
+    density_dist.run()
 
-        print(f"density analysis of {atom_name} is done")
 
 if __name__ == '__main__':
     main()

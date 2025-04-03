@@ -5,8 +5,8 @@ import numpy as np
 from matplotlib import pyplot as plt
 from matplotlib import rcParams
 import matplotlib.ticker as ticker
-import yaml, argparse
-from util import fig_operation
+import yaml, click
+from mdtool.util import fig_operation
 
 DEFAULT_CONFIG = {
         'data': {},
@@ -134,14 +134,14 @@ def check_ticks_fontsize(ax, ticks_fontsize):
             pass
 
 
-def mode_1(data_dict, args, figure):
+def mode_1(data_dict, figure, **kwargs):
     # init config
     check_figsize(data_dict['figsize'])
 
     fig, ax = plt.subplots()
 
     # ticks config
-    check_int_ticks(ax, args.int_ticks)
+    check_int_ticks(ax, kwargs['int_ticks'])
 
     # plot part
     for label, data in data_dict['data'].items():
@@ -167,17 +167,17 @@ def mode_1(data_dict, args, figure):
         check_lenend_fontsize(ax, data_dict['legend_fontsize'])
 
     # output part
-    check_output_mode(fig, plt, args.m, figure, data_dict['fold'])
+    check_output_mode(fig, plt, kwargs['m'], figure, data_dict['fold'])
 
 
-def mode_2(data_dict, args, figure):
+def mode_2(data_dict, figure, **kwargs):
     # init config
     check_figsize(data_dict['figsize'])
 
     fig, ax = plt.subplots()
 
     # ticks config
-    check_int_ticks(ax, args.int_ticks)
+    check_int_ticks(ax, kwargs['int_ticks'])
 
     # plot part
     ylabel, data = next(iter(data_dict['data'].items()))
@@ -198,17 +198,17 @@ def mode_2(data_dict, args, figure):
     check_lenend_fontsize(ax, data_dict['legend_fontsize'])
 
     # output part
-    check_output_mode(fig, plt, args.m, figure, data_dict['fold'])
+    check_output_mode(fig, plt, kwargs['m'], figure, data_dict['fold'])
 
 
-def mode_error(data_dict, args, figure):
+def mode_error(data_dict, figure, **kwargs):
     # init config
     check_figsize(data_dict['figsize'])
 
     fig, ax = plt.subplots(figsize=(4.8, 4.8))
 
     # ticks config
-    check_int_ticks(ax, args.int_ticks)
+    check_int_ticks(ax, kwargs['int_ticks'])
 
     # plot part
     label, data = next(iter(data_dict['data'].items()))
@@ -243,28 +243,18 @@ def mode_error(data_dict, args, figure):
     check_lenend_fontsize(ax, data_dict['legend_fontsize'], rmse=data_rmse)
 
     # output part
-    check_output_mode(fig, plt, args.m, figure, data_dict['fold'])
+    check_output_mode(fig, plt, kwargs['m'], figure, data_dict['fold'])
 
 
-def parse_range(s):
-    return [float(x) for x in s.replace(',', ' ').split()]
-
-
-def parse_argument():
-    parser = argparse.ArgumentParser(description='plot data with yaml file')
-    parser.add_argument('yaml_file', type=str, nargs='+', help='input yaml file')
-    parser.add_argument('--int_ticks', help='set x ticks or y ticks with int, choices: x, y, a(all)', choices=['x', 'y', 'a'])
-    parser.add_argument('--error', help='set error mode', action='store_true')
-    parser.add_argument('-m', help='output mode: show, save, all, default is save', choices=['show', 'save', 'all'], default='save')
-
-    return parser.parse_args()
-
-
-def main():
+@click.command(name='plot')
+@click.argument('yaml_file', type=click.Path(exists=True), nargs=-1)
+@click.option('--int_ticks', help='set x ticks or y ticks with int, choices: x, y, a(all)', type=click.Choice(['x', 'y', 'a']))
+@click.option('--error', help='set error mode', is_flag=True)
+@click.option('-m', help='output mode: show, save, all, default is save', type=click.Choice(['show', 'save', 'all']), default='save')
+def main(yaml_file, int_ticks, error, m):
+    kwargs = locals()
     figure_dict = {}
-    args = parse_argument()
-
-    for yaml_file in args.yaml_file:
+    for yaml_file in yaml_file:
         yaml_dict = load_config(yaml_file)
         figure_dict.update(yaml_dict)
 
@@ -272,9 +262,9 @@ def main():
             check_data = len(data_dict['data'])
 
             # mode error
-            if args.error:
+            if error:
                 mode = 'error'
-                mode_error(data_dict, args, figure)
+                mode_error(data_dict, figure, **kwargs)
 
             # mode 1
             elif check_data > 1:
@@ -282,12 +272,12 @@ def main():
                     print("wrong yaml structure")
                     exit(1)
                 mode = 1
-                mode_1(data_dict, args, figure)
+                mode_1(data_dict, figure, **kwargs)
 
             # mode 2
             elif check_data == 1:
                 mode = 2
-                mode_2(data_dict, args, figure)
+                mode_2(data_dict, figure, **kwargs)
 
             else:
                 print("wrong yaml structure")

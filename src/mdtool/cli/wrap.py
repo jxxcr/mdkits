@@ -13,11 +13,8 @@ from mdtool.util import (
 @click.command(name='wrap')
 @click.argument('filename', type=click.Path(exists=True), default=os_operation.default_file_name('*-pos-1.xyz', last=True))
 @click.option('-o', type=str, help='output file name', default='wraped.xyz', show_default=True)
-@click.option('--cp2k_input_file', type=str, help='input file name of cp2k', default='input.inp', show_default=True)
-@click.option('--cell', type=arg_type.Cell, help='set cell, a list of lattice, --cell x,y,z or x,y,z,a,b,c')
-def main(filename, o, cp2k_input_file, cell):
-    if cell is None:
-        cell = cp2k_input_parsing.parse_cell(cp2k_input_file)
+@click.option('--cell', type=arg_type.Cell, help='set cell from cp2k input file or a list of lattice: --cell x,y,z or x,y,z,a,b,c', default='input.inp', show_default=True)
+def main(filename, o, cell):
     u = Universe(filename)
     u.dimensions = cell
     ag = u.select_atoms("all")
