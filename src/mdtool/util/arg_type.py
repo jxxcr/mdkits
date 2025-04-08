@@ -7,7 +7,7 @@ class CellType(click.ParamType):
 
     def convert(self, value, param, ctx):
         if isinstance(value, str):
-            if os.path.exists(value):
+            if ',' not in value:
                 cell = cp2k_input_parsing.parse_cell(value)
                 return cell
             else:

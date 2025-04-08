@@ -14,7 +14,7 @@ from mdtool.util import encapsulated_ase, arg_type
 @click.option('--coord', help='coord format', is_flag=True)
 @click.option('--cp2k', help='convert to cp2k format(coord + cell)', is_flag=True)
 @click.option('--center', help='center atoms', is_flag=True)
-@click.option('--cp2k_input_file', type=str, help='input file name of cp2k', default='input.inp', show_default=True)
+@click.option('--cell', type=arg_type.Cell, help='set cell from cp2k input file or a list of lattice: --cell x,y,z or x,y,z,a,b,c', default='input.inp', show_default=True)
 @click.option('-o', type=str, help='specify the output file name without suffix', default='out', show_default=True)
 @click.argument('file_name', type=click.Path(exists=True))
 def main(c, x, d, v, coord, cp2k, center, cell, o, file_name):
