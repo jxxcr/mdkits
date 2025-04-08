@@ -1,5 +1,8 @@
 # MD 轨迹分析脚本
-mdtool 提供了多种工具
+`mdtool` 提供了多种工具, 安装脚本:
+```bash
+pip install mdtool --upgrade
+```
 ### 密度分布
 
 ### 氢键
