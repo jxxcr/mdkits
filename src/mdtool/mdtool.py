@@ -10,8 +10,9 @@ from mdtool.cli import (
 
 @click.group(name='cli')
 @click.pass_context
+@click.version_option()
 def cli(ctx):
-    """mdtool is a tool for managing markdown files."""
+    """tools for md or dft"""
     pass
 
 

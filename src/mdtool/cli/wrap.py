@@ -15,6 +15,10 @@ from mdtool.util import (
 @click.option('-o', type=str, help='output file name', default='wraped.xyz', show_default=True)
 @click.option('--cell', type=arg_type.Cell, help='set cell from cp2k input file or a list of lattice: --cell x,y,z or x,y,z,a,b,c', default='input.inp', show_default=True)
 def main(filename, o, cell):
+    """
+    wrap the coordinates in a cell from a trajectory file
+    """
+
     u = Universe(filename)
     u.dimensions = cell
     ag = u.select_atoms("all")

@@ -20,6 +20,10 @@ def match_file(patch):
 @click.option('--err', help='error bar of data', is_flag=True)
 @click.option('--int_cn', type=float, nargs=2, help='integrate gofr data to coordination number', default=None)
 def main(filename, nor, gaus, fold, err, int_cn):
+    """
+    trade data file with different method
+    """
+
     for data_file in filename:
         data = np.loadtxt(data_file)
         data_name = data_file.split(os.sep)[-1]

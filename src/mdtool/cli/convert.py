@@ -18,6 +18,9 @@ from mdtool.util import encapsulated_ase, arg_type
 @click.option('-o', type=str, help='specify the output file name without suffix', default='out', show_default=True)
 @click.argument('file_name', type=click.Path(exists=True))
 def main(c, x, d, v, coord, cp2k, center, cell, o, file_name):
+    """
+    convet structure file in some formats
+    """
     atoms = encapsulated_ase.atoms_read_with_cell(file_name, cell=cell, coord_mode=coord)
 
     if center:

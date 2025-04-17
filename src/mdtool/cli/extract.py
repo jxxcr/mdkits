@@ -43,6 +43,10 @@ def write_to_xyz_s(u, frames, cut=None):
 @click.option('-r', type=arg_type.FrameRange, help='frame range to slice', default='-1', show_default=True)
 @click.option('-c', help='output a coord.xyz', is_flag=True)
 def main(input_file_name, o, r, c):
+    """
+    extract frames in trajectory file
+    """
+
     u = Universe(input_file_name)
     group = u.trajectory[slice(*r)]
     click.echo(f"total frames is {len(u.trajectory)}")
