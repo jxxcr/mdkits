@@ -48,6 +48,7 @@ def main(input_file_name, o, r, c):
     """
 
     u = Universe(input_file_name)
+    print(f"frame range slice is {slice(*r)}")
     group = u.trajectory[slice(*r)]
     click.echo(f"total frames is {len(u.trajectory)}")
     frames = [ts.frame for ts in group]
