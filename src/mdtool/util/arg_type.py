@@ -29,10 +29,7 @@ class FrameRangeType(click.ParamType):
         if isinstance(value, str):
             parts = value.split(':')
 
-            if len(parts) == 1 and parts[0] != '':
-                range_list = [None, int(parts[0]), None]
-            else:
-                range_list = [int(x) if x else None for x in parts]
+            range_list = [int(x) if x else None for x in parts]
 
             if len(range_list) > 0 and len(range_list) <= 3:
                 return range_list

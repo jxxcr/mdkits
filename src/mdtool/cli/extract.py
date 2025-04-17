@@ -48,8 +48,12 @@ def main(input_file_name, o, r, c):
     """
 
     u = Universe(input_file_name)
-    print(f"frame range slice is {slice(*r)}")
-    group = u.trajectory[slice(*r)]
+    if len(r) == 1:
+        print(f"frame range slice is {r}")
+        group = u.trajectory[r]
+    else:
+        print(f"frame range slice is {slice(*r)}")
+        group = u.trajectory[slice(*r)]
     click.echo(f"total frames is {len(u.trajectory)}")
     frames = [ts.frame for ts in group]
 
@@ -66,9 +70,9 @@ def main(input_file_name, o, r, c):
             shutil.rmtree('./coord')
             os.makedirs('./coord')
         write_to_xyz_s(u, frames, cut=cut)
+        click.echo(os.path.abspath('./coord'))
     else:
         write_to_xyz(u, frames, o, cut=cut)
-
         click.echo(os.path.abspath(o))
 
 
