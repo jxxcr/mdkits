@@ -1,14 +1,16 @@
 [tool.poetry]
 name = "mdtool"
-version = "0.1.9"
+version = "0.1.10"
 description = "tools for md or dft"
 readme = "README.md"
 authors = ["jxxcr <jixxcr@qq.com>"]
 license = "MIT"
+keywords = ["molecular dynamics", "density functional theory"]
 classifiers = [
     "Operating System :: OS Independent",
     "Programming Language :: Python :: 3.11",
 ]
+repository = "https://github.com/jxxcr/mdtool"
 
 [tool.poetry.dependencies]
 python = "^3.11"
