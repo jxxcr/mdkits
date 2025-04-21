@@ -1,5 +1,5 @@
 """Tests"""
-from mdtool import __version__
+from mdkits import __version__
 
 
 def test_version():

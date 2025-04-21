@@ -5,7 +5,7 @@ import click
 import MDAnalysis
 from MDAnalysis import Universe
 from MDAnalysis.analysis.base import AnalysisBase
-from mdtool.util import cp2k_input_parsing, numpy_geo, encapsulated_mda
+from mdkits.util import cp2k_input_parsing, numpy_geo, encapsulated_mda
 import warnings
 warnings.filterwarnings("ignore")
 

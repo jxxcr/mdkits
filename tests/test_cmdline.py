@@ -4,8 +4,8 @@ from __future__ import annotations  # PEP 585
 import pytest
 from click.testing import CliRunner
 
-from mdtool import __version__
-from mdtool.cmdline import main
+from mdkits import __version__
+from mdkits.cmdline import main
 
 
 @pytest.mark.parametrize(

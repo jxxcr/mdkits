@@ -3,7 +3,7 @@
 import os
 from MDAnalysis import Universe
 import MDAnalysis, click
-from mdtool.util import (
+from mdkits.util import (
     arg_type,
     os_operation,
     cp2k_input_parsing

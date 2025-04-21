@@ -3,7 +3,7 @@
 from ase.io import write
 import click
 import os
-from mdtool.util import encapsulated_ase, arg_type
+from mdkits.util import encapsulated_ase, arg_type
 
 
 @click.command(name='convert')

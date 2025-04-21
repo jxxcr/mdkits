@@ -6,7 +6,7 @@ from matplotlib import pyplot as plt
 from matplotlib import rcParams
 import matplotlib.ticker as ticker
 import yaml, click
-from mdtool.util import fig_operation
+from mdkits.util import fig_operation
 
 DEFAULT_CONFIG = {
         'data': {},

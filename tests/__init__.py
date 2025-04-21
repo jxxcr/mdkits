@@ -1,7 +1,7 @@
 """Test"""
 from pathlib import Path
 
-from mdtool.config import settings
+from mdkits.config import settings
 
 
 def merge_test_settings():

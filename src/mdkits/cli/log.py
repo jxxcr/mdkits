@@ -3,7 +3,7 @@ import logging
 import os
 from logging.config import dictConfig
 
-from mdtool.config import settings
+from mdkits.config import settings
 
 os.makedirs(settings.LOGPATH, exist_ok=True)
 

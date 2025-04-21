@@ -2,9 +2,9 @@
 import click
 from click import Context
 
-from mdtool import __version__
-from mdtool.config import settings
-from mdtool.log import init_log
+from mdkits import __version__
+from mdkits.config import settings
+from mdkits.log import init_log
 
 
 @click.group(invoke_without_command=True)

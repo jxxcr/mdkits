@@ -1,7 +1,7 @@
 """Test log"""
 import pytest
 
-from mdtool.log import update_log_level, verbose_formatter
+from mdkits.log import update_log_level, verbose_formatter
 
 
 @pytest.mark.parametrize(

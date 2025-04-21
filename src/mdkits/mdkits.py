@@ -1,5 +1,5 @@
 import click
-from mdtool.cli import (
+from mdkits.cli import (
     convert,
     wrap,
     extract,

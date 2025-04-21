@@ -4,7 +4,7 @@
 
 import os
 import click
-from mdtool.util import os_operation, arg_type
+from mdkits.util import os_operation, arg_type
 import MDAnalysis
 from MDAnalysis import Universe
 

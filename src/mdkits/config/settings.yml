@@ -1,4 +1,4 @@
 verbose: false
 debug: false
 loglevel: warning
-logpath: /tmp/mdtool
+logpath: /tmp/mdkits
