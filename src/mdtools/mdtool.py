@@ -12,6 +12,7 @@ from mdtool.cli import (
 @click.pass_context
 @click.version_option()
 def cli(ctx):
+    print(ctx)
     """tools for md or dft"""
     pass
 
