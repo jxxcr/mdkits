@@ -106,7 +106,7 @@ class Density_distribution(AnalysisBase):
 @click.option('-o', type=str, help='output file name', default='density.dat', show_default=True)
 @click.option('--update_water', is_flag=True, help='update water with distance or angle judgment')
 @click.option('--distance', type=float, help='update water distance judgment', default=1.2, show_default=True)
-@click.option('--angle', type=(float), help='update water angle judgment')
+@click.option('--angle', type=(float, float), help='update water angle judgment')
 @click.option('--surface', type=str, help='surface element')
 def main(filename, cell, o, element, density, update_water, distance, angle, surface):
     """
