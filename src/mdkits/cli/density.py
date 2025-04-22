@@ -113,7 +113,7 @@ def main(filename, cell, o, element, density, update_water, distance, angle, sur
     analysis density or concentration of element in a trajectory file
     """
 
-    density_dist = Density_distribution(filename, cell, o=o, distance_judg=distance, angle_judg=angle, element=element, concentratoin=concentration, density=density, update_water=update_water, surface=surface)
+    density_dist = Density_distribution(filename, cell, o=o, distance_judg=distance, angle_judg=angle, element=element, density=density, update_water=update_water, surface=surface)
 
     density_dist.run()
 
