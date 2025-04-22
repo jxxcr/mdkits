@@ -97,7 +97,7 @@ def unwrap(atom1, atom2, coefficients, max=0, total=False):
 
 
 def find_surface(surface_group:np.ndarray, layer_tolerance=1, surface_tolerance=5):
-    sort_group = surface_group.sort()
+    sort_group = np.sort(surface_group)
     layer_mean = []
     current_layer = [sort_group[0]]
     for i in range(1, len(sort_group)):
@@ -106,6 +106,7 @@ def find_surface(surface_group:np.ndarray, layer_tolerance=1, surface_tolerance=
         else:
             layer_mean.append(np.mean(current_layer))
             current_layer = [sort_group[i]]
+        layer_mean.append(np.mean(current_layer))
     
     if len(current_layer) == 1:
         return layer_mean[0]
@@ -115,4 +116,4 @@ def find_surface(surface_group:np.ndarray, layer_tolerance=1, surface_tolerance=
         index = np.argmax(diff > 5)
         return (layer_mean[index], layer_mean[index + 1])
     else:
-        return layer_mean[-1]
+        return (layer_mean[-1], layer_mean[0])

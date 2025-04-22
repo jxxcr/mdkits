@@ -5,6 +5,7 @@ from mdkits.cli import (
     extract,
     data,
     plot,
+    density
 )
 
 
@@ -12,7 +13,6 @@ from mdkits.cli import (
 @click.pass_context
 @click.version_option()
 def cli(ctx):
-    print(ctx)
     """tools for md or dft"""
     pass
 
@@ -22,6 +22,7 @@ cli.add_command(wrap.main)
 cli.add_command(extract.main)
 cli.add_command(data.main)
 cli.add_command(plot.main)
+cli.add_command(density.main)
 
 
 if __name__ == '__main__':
