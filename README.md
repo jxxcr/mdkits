@@ -3,7 +3,27 @@
 ```bash
 pip install mdkits --upgrade
 ```
+
 ### 密度分布
+`density`用于分析体系中的某种元素沿z轴的密度分布, 如分析体系中的`O`元素沿z轴的密度分布, `--element`选项指定元素使用`MDAnalysis`的[选择语言](https://userguide.mdanalysis.org/stable/selections.html):
+```bash
+mdkits density --element="name H" --cell [FILENAME]
+```
+这样会输出一个文件名为`density_name_H.dat`的文件, 第一列为z轴坐标, 第二列为浓度分布, 单位为 mol/L. 如果想输出为单位为 $g/cm^3$ 的密度分布, 可以指定`--atomic_mass` 选项, 如:
+```bash
+mdkits density --element="name H" --cell [FILENAME] --atomic_mass=1.00784
+```
+则输出单位为 $g/cm^3$ 的密度分布. 可以指定表面原子来将密度分布归一化到表面, 如:
+```bash
+mdkits density --element="name O" --cell 10,10,10 --atomic_mass=18.01528 --surface="name Pt and name Ru"
+```
+这样会将密度分布归一化到表面, 同时以O原子的位置作为水分子的位置分析处理水分子的密度分布. 对于体系中存在 $OH^-$ 离子的体系可以使用`--update_water`的选项在每一帧更新水分子的位置, 不需要额外指定元素, 如:
+```bash
+mdkits density --update_water --cell 10,10,10 --atomic_mass=18.01528 --surface="name Pt and name Ru"
+```
+输出的文件名为`density_water.dat`.
+
+### 水平分布
 
 ### 氢键
 

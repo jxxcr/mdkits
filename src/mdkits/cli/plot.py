@@ -252,6 +252,10 @@ def mode_error(data_dict, figure, **kwargs):
 @click.option('--error', help='set error mode', is_flag=True)
 @click.option('-m', help='output mode: show, save, all, default is save', type=click.Choice(['show', 'save', 'all']), default='save')
 def main(yaml_file, int_ticks, error, m):
+    """
+    a plot tool, read yaml file to plot
+    """
+
     kwargs = locals()
     figure_dict = {}
     for yaml_file in yaml_file:

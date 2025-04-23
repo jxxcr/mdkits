@@ -2,7 +2,6 @@
 
 import numpy as np
 import click
-import MDAnalysis
 from MDAnalysis import Universe
 from MDAnalysis.analysis.base import AnalysisBase
 from mdkits.util import (
@@ -11,29 +10,42 @@ from mdkits.util import (
     encapsulated_mda,
     os_operation,
 )
-import warnings
+import warnings, sys
 warnings.filterwarnings("ignore")
 
 
 class Density_distribution(AnalysisBase):
-    def __init__(self, filename, cell, o, element, density, update_water, distance_judg, angle_judg, surface, dt=0.001, bin_size=0.2, return_index=False):
+    def __init__(self, filename, cell, o, element, atomic_mass, update_water, distance_judg, angle_judg, surface, dt=0.001, bin_size=0.2, return_index=False):
         u = Universe(filename)
         u.trajectory.ts.dt = dt
         u.dimensions = cell
 
         self.u = u
-        self.o = o
-        self.distance_judg = distance_judg
-        self.angle_judg = angle_judg
         self.atomgroup = u.select_atoms("all")
-        self.mid_z = u.dimensions[2]/2
         self.bin_size = bin_size
         self.frame_count = 0
         self.return_index = return_index
         self.surface = surface
-        self.element = element
-        self.density = density
-        self.update_water = update_water
+        self.atomic_mass = atomic_mass
+
+        if element is None and update_water is False:
+            sys.exit("Please specify the element to analysis or use --update-water option")
+
+        if element:
+            self.element = element
+
+        if update_water:
+            self.update_water = update_water
+            self.distance_judg = distance_judg
+            self.angle_judg = angle_judg
+
+        if o == 'density_{element}.dat':
+            if self.update_water:
+                self.o = "density_water.dat"
+            else:
+                self.o = f"density_{element.replace(' ', '_')}.dat"
+        else:
+            self.o = o
 
         if surface is not None:
             self.surface_group = self.atomgroup.select_atoms(f"{surface}")
@@ -77,8 +89,8 @@ class Density_distribution(AnalysisBase):
         if self.frame_count > 0:
             V = self.u.dimensions[0] * self.u.dimensions[1] * self.bin_size
 
-            if self.density:
-                density_distribution = (self.density_distribution * self.density * 1.660539 / V) / self.frame_count
+            if self.atomic_mass:
+                density_distribution = (self.density_distribution * self.atomic_mass * 1.660539 / V) / self.frame_count
             else:
                 density_distribution = (self.density_distribution * (10000/6.02) / V) / self.frame_count
 
@@ -102,18 +114,18 @@ class Density_distribution(AnalysisBase):
 @click.argument('filename', type=click.Path(exists=True), default=os_operation.default_file_name('*-pos-1.xyz', last=True))
 @click.option('--cell', type=arg_type.Cell, help='set cell from cp2k input file or a list of lattice: --cell x,y,z or x,y,z,a,b,c', default='input.inp', show_default=True)
 @click.option('--element', type=str, help='element to analysis')
-@click.option('--density', type=float, help='output density unit (g/cm3), should give atomic mass of element, else is concentration unit (mol/L)')
-@click.option('-o', type=str, help='output file name', default='density.dat', show_default=True)
+@click.option('--atomic_mass', type=float, help='output density unit (g/cm3), should give atomic mass of element, else is concentration unit (mol/L)')
+@click.option('-o', type=str, help='output file name', default='density_{element}.dat', show_default=True)
 @click.option('--update_water', is_flag=True, help='update water with distance or angle judgment')
 @click.option('--distance', type=float, help='update water distance judgment', default=1.2, show_default=True)
 @click.option('--angle', type=(float, float), help='update water angle judgment')
 @click.option('--surface', type=str, help='surface element')
-def main(filename, cell, o, element, density, update_water, distance, angle, surface):
+def main(filename, cell, o, element, atomic_mass, update_water, distance, angle, surface):
     """
     analysis density or concentration of element in a trajectory file
     """
 
-    density_dist = Density_distribution(filename, cell, o=o, distance_judg=distance, angle_judg=angle, element=element, density=density, update_water=update_water, surface=surface)
+    density_dist = Density_distribution(filename, cell, o=o, distance_judg=distance, angle_judg=angle, element=element, atomic_mass=atomic_mass, update_water=update_water, surface=surface)
 
     density_dist.run()
 
