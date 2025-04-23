@@ -23,8 +23,6 @@ mdkits density [FILENAME] --update_water --cell 10,10,10 --atomic_mass=18.01528 
 ```
 输出的文件名为`density_water.dat`.
 
-### 水平分布
-
 ### 氢键
 
 #### 单个水分子
@@ -97,7 +95,7 @@ mdkits convert -c structure.cif -o structure_xyz
 1. `--nor`: 对数据进行归一化处理
 2. `--gaus`: 对数据进行高斯过滤
 3. `--fold`: 堆数据进行折叠平均
-4. `--err`: 计算数据的误差棒
+4. `--err`: 计算数据的误差棒   
 等
 
 ### 绘图工具
