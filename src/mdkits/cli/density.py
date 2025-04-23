@@ -27,15 +27,13 @@ class Density_distribution(AnalysisBase):
         self.return_index = return_index
         self.surface = surface
         self.atomic_mass = atomic_mass
+        self.update_water = update_water
+        self.element = element
 
         if element is None and update_water is False:
             sys.exit("Please specify the element to analysis or use --update-water option")
 
-        if element:
-            self.element = element
-
-        if update_water:
-            self.update_water = update_water
+        if self.update_water:
             self.distance_judg = distance_judg
             self.angle_judg = angle_judg
 
@@ -49,6 +47,8 @@ class Density_distribution(AnalysisBase):
 
         if surface is not None:
             self.surface_group = self.atomgroup.select_atoms(f"{surface}")
+            if self.surface_group.n_atoms == 0:
+                sys.exit("Please specify the correct surface group")
         else:
             self.surface_group = False
 
