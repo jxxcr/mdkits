@@ -57,9 +57,16 @@ mdkits wrap [FILENAME] --cell 10,10,10
 ## DFT 性质分析脚本
 ### PDOS
 
-### 静电势
-
-### 电荷差分
+### CUBE 文件
+`cube`用于处理[`cube`格式](https://paulbourke.net/dataformats/cube/)的文件, 将其在z轴上进行平均:
+```bash
+mdkits cube [FILENAME]
+```
+分析好的数据会输出为`cube.out`, 可以同时计算一个区域内的平均值:
+```bash
+mdkits cube [FILENAME] -b 1 2
+```
+会将平均值打印在屏幕上, 同时记录在`cube.out`中的注释行.
 
 ## 其他
 ### 轨迹提取

@@ -1,59 +1,39 @@
 #!/usr/bin/env python3
 
-################################################
-# averange cp2k output(or some else file correspond to ase.io.read_cube_data) hartree.cube to z coordinate with python
-## file path is need to pay attention
-## cycle parameter is need to pay attention
-## buck range is need to pay attention
-################################################
-
-from numpy import empty, array, mean, append, concatenate
-from argparse import ArgumentParser
-from util import encapsulated_ase, os_operation
+import numpy as np
+import click
+from mdkits.util import encapsulated_ase, os_operation
 
 
-def array_type(string):
-	number_list = string.split(',')
-	number_array = array(number_list, dtype=float)
-	return number_array
+def ave_cube_data(cube_data, range):
+	mask = (cube_data[:,0] >= range[0]) & (cube_data[:,0] <=range[1])
+	bulk_cube_data = cube_data[mask]
+	ave_cube_data = np.mean(bulk_cube_data[:,1])
+	return ave_cube_data
 
 
-def buck_potential(xaxe, potential, range):
-	mix = concatenate((xaxe.reshape(-1, 1), potential.reshape(-1, 1)), axis=1)
-	mask = (mix[:,0] >= range[0]) & (mix[:,0] <=range[1])
-	buck_potential = mix[mask]
-	ave_potential = mean(buck_potential[:,1])
-	return ave_potential
+@click.command(name='cube')
+@click.argument('filename', type=click.Path(exists=True), default=os_operation.default_file_name('*.cube', last=True))
+@click.option('-b', '--bulk_range', type=(float, float), help='parameter to calculate mean value of bulk', default=None)
+@click.option('-o', type=str, help='output file name, default is "cube.out"', default='cube.out', show_default=True)
+def main(filename, bulk_range, o):
+	"""
+	analysis cube file
+	"""
+
+	cube_data = encapsulated_ase.ave_cube(filename)
+
+	## if bulk range is exit, out put a difference of cube_data
+	if bulk_range is not None:
+		bulk_cube_data = ave_cube_data(cube_data, bulk_range)
+		print(bulk_cube_data)
+		np.savetxt(o, cube_data, header=f'Z\tcube_data\t area average is: {bulk_cube_data}')
+	
+	else:
+		np.savetxt(o, cube_data, header='Z\tcube_data')
+
+	
 
 
-# set argument
-parser = ArgumentParser(description='to handle cp2k output file hartree cube, name should be "hartree-*.cube"')
-parser.add_argument('file_name', type=str, nargs='?', help='hartree cube file', default=os_operation.default_file_name('*-v_hartree-1_*.cube', last=True))
-parser.add_argument('-b', '--buck_range', type=array_type, help='parameter to calculate mean value of buck', default=None)
-parser.add_argument('-o', type=str, help='output file name, default is "out.put"', default='hartree.out')
-
-args = parser.parse_args()
-
-
-## init output potential file's shape, and define a z axe
-init_array = encapsulated_ase.ave_potential(args.file_name)
-potential = empty((0, init_array[0].shape[0]))
-z_coordinates = array((init_array[1])).reshape(-1, 1)
-
-potential = encapsulated_ase.ave_potential(args.file_name)[0]
-
-aved = mean(potential, axis=0)
-total_potential = append(z_coordinates, potential.reshape(-1, 1), axis=1)
-
-## if buck range is exit, out put a difference of potential
-if args.buck_range is not None:
-	buck_potential = buck_potential(z_coordinates, potential, args.buck_range)
-	print(buck_potential)
-	with open('hartree_potential.dat', 'w') as f:
-		f.write(f"{buck_potential}" + '\n')
-
-## write output
-with open(args.o, 'w') as f:
-	for value in total_potential:
-		f.write(" ".join(map(str, value)) + '\n')
-
+if __name__ == '__main__':
+	main()

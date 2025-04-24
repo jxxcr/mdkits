@@ -5,7 +5,8 @@ from mdkits.cli import (
     extract,
     data,
     plot,
-    density
+    density,
+    cube,
 )
 
 
@@ -23,6 +24,7 @@ cli.add_command(extract.main)
 cli.add_command(data.main)
 cli.add_command(plot.main)
 cli.add_command(density.main)
+cli.add_command(cube.main)
 
 
 if __name__ == '__main__':

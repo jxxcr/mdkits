@@ -65,13 +65,13 @@ def rdf(chunk, cell, bin_size, name, parallel=True):
     ana.clear_cache()
 
 
-def ave_potential(filepath):
+def ave_cube(filepath):
     """
     function: average hartree file in z_coordinate
     parameter:
         filepath: hartree cube file path
     return:
-        z_potential: a list of potential alone z axes
+        z_cube_data: a list of cube data alone z axes
         z_coordinates: a list of coordinates of z axes
     """
     # read data from filepath
@@ -81,8 +81,8 @@ def ave_potential(filepath):
     step_size = atoms.cell[2, 2] / ( npoints - 1 )
     # average hartree file, and calculate z_coordinates
     z_coordinates = [i * step_size for i in range(npoints)]
-    z_potential = 27.2114 * data[:, :, :].sum(axis=(0, 1)) / ( data.shape[0] * data.shape[1] )
-    return z_potential, z_coordinates
+    z_cube_data = data[:, :, :].sum(axis=(0, 1)) / ( data.shape[0] * data.shape[1] )
+    return np.column_stack((z_coordinates, z_cube_data))
 
 
 def atoms_read_with_cell(file_name, cell=None, coord_mode=False, default_cell=np.array([0., 0., 0., 90., 90., 90.])):
