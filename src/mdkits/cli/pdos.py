@@ -1,36 +1,37 @@
-#!/usr/bin/env python3.9
-
-# caculate pdos
+#!/usr/bin/env python3
 
 from cp2kdata import Cp2kPdos
-import argparse
+import click
 import numpy as np
-from util import os_operation
-
-
-def to_file(filename, ener, dos):
-	to_file = np.column_stack((ener, dos))
-	np.savetxt(filename, to_file, delimiter=" ")
+from mdkits.util import os_operation
 
 
 # set argument
-parser = argparse.ArgumentParser(description='calculate pdos')
-parser.add_argument('filename', type=str, nargs='?', default=os_operation.default_file_name('*-k*.pdos'))
-parser.add_argument('--type', type=str, default='total')
-args = parser.parse_args()
+@click.command(name='pdos')
+@click.argument('filename', type=list, default=os_operation.default_file_name('*-k*.pdos'))
+@click.option('-t', '--type', type=str, default='total', show_default=True)
+@click.option('-c', '--clos', type=tuple)
+def main(filename, type, clos):
+    if type == 'total':
+        dos_obj = Cp2kPdos(filename[0])
+        dos, ener = dos_obj.get_raw_dos(dos_type=type)
+        print(f"analysis of total dos is done")
+        np.savetxt('total.pdos', np.column_stack((ener, dos)), header='energy\tdos')
+    else:
+        if type:
+            for file in filename:
+                dos_obj = Cp2kPdos(file)
+                dos, ener = dos_obj.get_raw_dos(dos_type=type)
+                print(f"analysis of {file}'s {type} dos is done")
+                np.savetxt(f'{dos_obj.read_dos_element()}_{type}.pdos', np.column_stack((ener, dos)), header='energy\tdos')
+
+        if clos:
+            for file in filename:
+                dos_obj = Cp2kPdos(file)
+                dos, ener = dos_obj.get_raw_dos(usecols=clos)
+                print(f"analysis of {file}'s {type} dos is done")
+                np.savetxt(f'{dos_obj.read_dos_element()}_{"_".join(clos)}.pdos', np.column_stack((ener, dos)), header='energy\tdos')
 
 
-# pdos
-#dos_types = ['0']
-#for dos_type in dos_types:
-#	for atom_type in range(1, args.type_number+1):
-#		dos_obj = Cp2kPdos(f'{args.project_name}-k{atom_type}-1_{args.run_step}.pdos')
-#		dos, ener = dos_obj.get_raw_dos()
-#		to_file(f"{dos_obj.read_dos_element()}_{dos_type}.pdos", ener, dos)
-
-# total dos
-print(args.filename)
-for file in args.filename:
-    dos_obj = Cp2kPdos(file)
-    dos, ener = dos_obj.get_raw_dos(dos_type=args.type)
-    to_file(f'{dos_obj.read_dos_element()}_{args.type}.pdos', ener, dos)
+if __name__ == '__main__':
+    main()

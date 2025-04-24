@@ -56,6 +56,10 @@ mdkits wrap [FILENAME] --cell 10,10,10
 
 ## DFT 性质分析脚本
 ### PDOS
+`pdos`用于分析体系中的pdos, 分析[FILENAME]的d轨道的dos:
+```bash
+mdkits pdos [FILENAME] -t d
+```
 
 ### CUBE 文件
 `cube`用于处理[`cube`格式](https://paulbourke.net/dataformats/cube/)的文件, 将其在z轴上进行平均:
