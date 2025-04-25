@@ -72,6 +72,25 @@ mdkits cube [FILENAME] -b 1 2
 ```
 会将平均值打印在屏幕上, 同时记录在`cube.out`中的注释行.
 
+## 建模
+### 构建体相模型
+`build_bulk`用于构建体相模型, 如构建`Pt`的`fcc`体相模型:
+```bash
+mdkits build_bulk Pt fcc
+```
+构建为常胞模型:
+```bash
+mdkits build_bulk Pt fcc --cubic
+```
+构建一个`Caesium chloride`结构的模型:
+```bash
+mdkits build_bulk CsCl cesiumchloride -a 4.123
+```
+构建一个`fluorite `结构的模型:
+```bash
+mdkits build_bulk BaF2 fluorite -a 6.196
+```
+
 ## 其他
 ### 轨迹提取
 `extract`用于提取轨迹文件中的特定的帧, 如从`frames.xyz`中提取第 1000 帧到第 2000 帧的轨迹文件, 并输出为`1000-2000.xyz`, `-r`选项的参数与`Python`的切片语法一致:

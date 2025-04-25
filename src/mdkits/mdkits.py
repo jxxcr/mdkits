@@ -8,6 +8,7 @@ from mdkits.cli import (
     density,
     cube,
     pdos,
+    build_bulk,
 )
 
 
@@ -27,6 +28,7 @@ cli.add_command(plot.main)
 cli.add_command(density.main)
 cli.add_command(cube.main)
 cli.add_command(pdos.main)
+cli.add_command(build_bulk.main)
 
 
 if __name__ == '__main__':
