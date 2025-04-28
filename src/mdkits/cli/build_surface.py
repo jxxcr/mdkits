@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-import argparse, sys
+import click, sys
 from ase import build
 from ase.geometry import cell_to_cellpar
 from ase.io import write
@@ -22,7 +22,6 @@ def surface_check(obj, surface_type):
         exit()
 
 
-def parse_argument():
     parser = argparse.ArgumentParser(description='build a surface structure of matel')
     parser.add_argument('symbol', type=str, help='designate the symbol of matel')
     parser.add_argument('--face', type=str, help='designate the face of surface')
@@ -41,17 +40,21 @@ def parse_argument():
     parser.add_argument('--orth',  help='orth cell', action='store_true')
     parser.add_argument('--coverh',  type=int, help='cover H atom', default=0)
 
-    return parser.parse_args()
 
-
+@click.command(name='surface')
+@click.argument('symbol', type=str)
+@click.argument('surface', type=click.Choice(['fcc100', 'fcc110', 'fcc111', 'fcc211', 'bcc100', 'bcc110', 'bcc111', 'hcp0001', 'hcp10m10', 'diamond100', 'diamond111', 'mx2', 'graphene']))
+@click.argument('size', type=click.Tuple([int, int, int]))
+@click.option('-a', type=float, help='the lattice constant. if specified, it overrides the expermental lattice constant of the element. must be specified if setting up a crystal structure different from the one found in nature')
+@click.option('-c', type=float, help='extra hcp lattice constant. if specified, it overrides the expermental lattice constant of the element. Default is ideal ratio: sqrt(8/3)', default=np.sqrt(8/3), show_default=True)
+@click.option('--vacuum', type=float, help='designate vacuum of surface, default is None', default=0.0)
 def main():
-    args = parse_argument()
-    if args.primitive:
-        a = args.a * 0.7071 * 2
-    else:
-        a = args.a
+    #if args.primitive:
+    #    a = args.a * 0.7071 * 2
+    #else:
+    #    a = args.a
 
-    vacuum = args.vacuum / 2
+    vacuum = vacuum / 2
 
     build_surface = surface_check(build, args.face)
 

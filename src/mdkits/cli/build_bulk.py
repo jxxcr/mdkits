@@ -5,7 +5,7 @@ from ase.build import bulk
 import numpy as np
 
 
-@click.command(name='build_bulk')
+@click.command(name='bulk')
 @click.argument('symbol', type=str)
 @click.argument('cs', type=click.Choice(['sc', 'fcc', 'bcc', 'tetragonal', 'bct', 'hcp', 'rhombohedral', 'orthorhombic', 'mcl', 'diamond', 'zincblende', 'rocksalt', 'cesiumchloride', 'fluorite', 'wurtzite']))
 @click.option('-a', type=float, help='designate lattice constant a')

@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "mdkits"
-version = "0.1.4"
-description = "tools for md or dft"
+version = "0.1.a10"
+description = "kits for md or dft"
 readme = "README.md"
 authors = ["jxxcr <jixxcr@qq.com>"]
 license = "MIT"
