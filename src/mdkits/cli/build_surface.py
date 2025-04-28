@@ -1,135 +1,54 @@
 #!/usr/bin/env python3
 
-import click, sys
+import click
 from ase import build
-from ase.geometry import cell_to_cellpar
-from ase.io import write
 import numpy as np
-
-
-
-def parse_size(s):
-    if s == None:
-        return None
-    return [int(x) for x in s.replace(',', ' ').split()]
 
 
 def surface_check(obj, surface_type):
     if hasattr(obj, surface_type):
         return getattr(obj, surface_type)
-    else:
-        print(f'dont have face named {surface_type}')
-        exit()
-
-
-    parser = argparse.ArgumentParser(description='build a surface structure of matel')
-    parser.add_argument('symbol', type=str, help='designate the symbol of matel')
-    parser.add_argument('--face', type=str, help='designate the face of surface')
-    parser.add_argument('-a', type=float, help='designate a lattice constant', default=None)
-    parser.add_argument('--primitive', help='designate a lattice constant of real', action='store_true')
-    parser.add_argument('--size', type=parse_size, help='designate surface size(a,b,c)')
-    parser.add_argument('--vacuum', type=float, help='designate vacuum of surface, default is None', default=0.0)
-    parser.add_argument('--adsorbate', type=str, help='add adsorbate on surface', default=None)
-    parser.add_argument('--position', type=str, help='position of adsorbate', default='ontop')
-    parser.add_argument('--offset', type=str, help='offset')
-    parser.add_argument('--height', type=float, help='position of adsorbate', default=1)
-    parser.add_argument('-o', type=str, help='output structure name', default='surface.xyz')
-    parser.add_argument('-c', help='output coord.xyz and cell.inc', action='store_true')
-    parser.add_argument('-k', type=parse_size, help='output kpoint.inc(a,b,c)', default=None)
-    parser.add_argument('--autok',  help='output kpoint.inc', action='store_true')
-    parser.add_argument('--orth',  help='orth cell', action='store_true')
-    parser.add_argument('--coverh',  type=int, help='cover H atom', default=0)
 
 
 @click.command(name='surface')
 @click.argument('symbol', type=str)
 @click.argument('surface', type=click.Choice(['fcc100', 'fcc110', 'fcc111', 'fcc211', 'bcc100', 'bcc110', 'bcc111', 'hcp0001', 'hcp10m10', 'diamond100', 'diamond111', 'mx2', 'graphene']))
 @click.argument('size', type=click.Tuple([int, int, int]))
+@click.option('--kind', type=click.Choice(['2H', '1T']), help='designate the kind of MX2 surface')
 @click.option('-a', type=float, help='the lattice constant. if specified, it overrides the expermental lattice constant of the element. must be specified if setting up a crystal structure different from the one found in nature')
 @click.option('-c', type=float, help='extra hcp lattice constant. if specified, it overrides the expermental lattice constant of the element. Default is ideal ratio: sqrt(8/3)', default=np.sqrt(8/3), show_default=True)
+@click.option('--thickness', type=float, help='Thickness of the layer, for mx2 and graphene')
+@click.option('--orth', is_flag=True, help='if specified and true, forces the creation of a unit cell with orthogonal basis vectors. if the default is such a unit cell, this argument is not supported')
 @click.option('--vacuum', type=float, help='designate vacuum of surface, default is None', default=0.0)
-def main():
+def main(symbol, surface, size, kind, a, c, thickness, orth, vacuum, adsorbate):
     #if args.primitive:
     #    a = args.a * 0.7071 * 2
     #else:
     #    a = args.a
 
     vacuum = vacuum / 2
+    build_surface = surface_check(build, surface)
+    out_filename = f"{symbol}_{surface}_{size[0]}{size[1]}{size[2]}_{adsorbate}.cif"
 
-    build_surface = surface_check(build, args.face)
-
-    if args.orth:
-        atoms = build_surface(args.symbol, args.size, a=a, vacuum=vacuum, orthogonal=args.orth)
-    else:
-        atoms = build_surface(args.symbol, args.size, a=a, vacuum=vacuum)
-
-    # add adsorbate
-    if args.adsorbate != None:
-        ## add H2Oa and OH
-        if args.adsorbate in ['H2Oa', 'OH']:
-            if args.adsorbate in ['OH']:
-                h2o = build.molecule(args.adsorbate)
-                h2o.rotate(90, 'y')
-                build.add_adsorbate(atoms, h2o, args.height, position=args.position, offset=args.offset)
-            else:
-                h2o = build.molecule('H2O')
-                h2o.rotate(90, 'y')
-                build.add_adsorbate(atoms, h2o, args.height, position=args.position, offset=args.offset)
-        ## add H2Ob
-        elif args.adsorbate in  ['H2Ob']:
-            h2o = build.molecule('H2O')
-            h2o.rotate(90, 'z')
-            h2o.rotate(45, 'y')
-            build.add_adsorbate(atoms, h2o, args.height, position=args.position, offset=args.offset)
-        ## add default something
+    if surface in ['hcp0001', 'hcp10m10']:
+        atoms = build_surface(symbol, size, a=a, c=c, vacuum=vacuum, orthogonal=orth)
+    elif surface in ['mx2']:
+        if thickness is None:
+            atoms = build_surface(symbol, size, kind=kind, a=a, vacuum=vacuum)
         else:
-            build.add_adsorbate(atoms, args.adsorbate, args.height, position=args.position, offset=args.offset)
+            atoms = build_surface(symbol, size, kind=kind, a=a, vacuum=vacuum, thickness=thickness)
+    elif surface in ['graphene']:
+        if a is None:
+            a = 2.46
 
-    # add h with coverage
-    if args.coverh != 0:
-        ## get atom position at surface
-        surface_positions_dict = {}
-        for atom in atoms:
-            if atom.tag == 1:
-                surface_positions_dict[atom.index] = atom.position
-        ## error checking
-        if site_number := len(surface_positions_dict) < args.coverh:
-            print(f"coverh is too big, please less then {site_number}")
-            sys.exit()
-        ## get random site
-        random_site_list = np.random.choice(list(surface_positions_dict.keys()), args.coverh, replace=False)
-        random_site_list = np.unique(random_site_list)
-        ## add H atom at hollow site
-        for site in random_site_list:
-            site_position = surface_positions_dict[site][0:2]
-            build.add_adsorbate(atoms, 'H', 2, position=site_position, offset=(0.3, 0.3))
-
-    # control output format
-    ## output with coord.xyz(cp2k format)
-    if args.c:
-        atoms.write('coord.xyz', format='xyz')
-        with open('coord.xyz', 'r') as f:
-            lines = f.readlines()[2:]
-        with open('coord.xyz', 'w') as f:
-            f.writelines(lines)
-        with open('cell.inc', 'w') as f:
-            cell = list(cell_to_cellpar(atoms.cell))
-            f.write('ABC [angstrom] ' + str(cell[0]) + ' ' + str(cell[1]) + ' ' + str(cell[2]) + ' ' + '\n')
-            f.write('ALPHA_BETA_GAMMA ' + str(cell[3]) + ' ' + str(cell[4]) + ' ' + str(cell[5]) + '\n')
-            ## output kpoint file with specific number
-            if args.k != None:
-                if True: #judge M or G
-                    with open('kpoint.inc', 'w') as f:
-                        f.write(f"SCHEME MONKHORST-PACK {args.k[0]} {args.k[1]} {args.k[2]}" + "\n")
-            ## output kpoint file autoly
-            if args.autok:
-                if True: # judge matel or semi or else
-                    if True: # judge M or G
-                        with open('kpoint.inc', 'w') as f:
-                            f.write(f"SCHEME MONKHORST-PACK {int(round(30/cell[0]))} {int(round(30/cell[1]))} {int(round(30/cell[2]))}" + "\n")
-    ## output default format or specific xyz file
+        if thickness is None:
+            atoms = build_surface(formula=symbol, size=size, a=a, vacuum=vacuum)
+        else:
+            atoms = build_surface(formula=symbol, size=size, thickness=thickness, a=a, vacuum=vacuum)
     else:
-        atoms.write(args.o)
+        atoms = build_surface(symbol, size, a=a, vacuum=vacuum, orthogonal=orth)
+    
+    atoms.write(out_filename)
 
 
 if __name__ == '__main__':

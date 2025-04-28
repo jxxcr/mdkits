@@ -37,5 +37,16 @@ class FrameRangeType(click.ParamType):
                 self.fail(f"{value} is not a valid frame range", param, ctx)
 
 
+from ase.collections import g2
+class MoleculeType(click.Choice):
+    name = "mocular type"
+    def __init__(self):
+        super().__init__(self)
+        g2.names.append(click.Path(exists=True))
+        self.choices = tuple(g2.names)
+
+
+
 Cell = CellType()
 FrameRange = FrameRangeType()
+Molecule = MoleculeType()

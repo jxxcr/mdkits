@@ -73,8 +73,10 @@ mdkits cube [FILENAME] -b 1 2
 会将平均值打印在屏幕上, 同时记录在`cube.out`中的注释行.
 
 ## 建模
+`build`为界面的工具, 其中包含多个建模工具
+
 ### 构建体相模型
-`build_bulk`用于构建体相模型, 如构建`Pt`的`fcc`体相模型:
+`bulk`用于构建体相模型, 如构建`Pt`的`fcc`体相模型:
 ```bash
 mdkits build_bulk Pt fcc
 ```
@@ -89,6 +91,20 @@ mdkits build_bulk CsCl cesiumchloride -a 4.123
 构建一个`fluorite `结构的模型:
 ```bash
 mdkits build_bulk BaF2 fluorite -a 6.196
+```
+
+### 构建表面模型
+`surface`用于构建常见的表面模型, 骑用法为:
+```bash
+mdkits build surface [ELEMENT] [SURFACE_TYPE] [SIZE]
+```
+如构建`Pt`的`fcc111`表面模型:
+```bash
+mdkits build surface Pt fcc111 2 2 3 --vacuum 15
+```
+构建石墨烯表面:
+```bash
+mdkits build surface C2 graphene 3 3 1 --vacuum 15
 ```
 
 ## 其他

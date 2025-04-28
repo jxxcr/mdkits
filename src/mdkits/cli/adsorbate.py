@@ -34,6 +34,10 @@ def parse_argument():
 
     return parser.parse_args()
 
+@click.option('--adsorbate', type=arg_type.Molecule, help='add adsorbate on surface')
+@click.option('--site', type=click.Choice(['ontop', 'hollow','fcc', 'hcp', 'bridge', 'shortbridge', 'longbridge']))
+@click.option('--height', type=float, help='height above the surface')
+@click.option('--rotate', type=click.Tuple([float, float, float]), help='rotate adsorbate molcule around x, y, z axis', default=(0, 0, 0))
 def main():
     args = parse_argument()
     atoms = encapsulated_ase.atoms_read_with_cell(args.filename, cell=args.cell, coord_mode=args.coord)
@@ -47,6 +51,11 @@ def main():
         if atom.index in args.index:
             position_list.append(np.copy(atom.position[0:2])+offset)
 
+        molecule = build.molecule(adsorbate)
+        molecule.rotate(rotate[0], 'x')
+        molecule.rotate(rotate[1], 'y')
+        molecule.rotate(rotate[2], 'z')
+        build.add_adsorbate(atoms, molecule, position=site, height=height)
     if args.m in g2.names:
         molecule = build.molecule(args.m)
         if args.x:
