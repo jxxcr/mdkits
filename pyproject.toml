@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "mdkits"
-version = "0.1.a10"
+version = "0.1.6"
 description = "kits for md or dft"
 readme = "README.md"
 authors = ["jxxcr <jixxcr@qq.com>"]
@@ -20,6 +20,7 @@ MDAnalysis = "^2.8.0"
 ase = "^3.22.1"
 matplotlib = "^3.9.0"
 pyyaml = "^6.0.1"
+Cp2kData = "^0.7.2"
 numpy = "^1.26.4"
 
 [tool.poetry.group.dev.dependencies]
