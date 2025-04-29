@@ -5,9 +5,10 @@ function: prase cp2k file
 
 
 import sys
+from mdkits.util import os_operation, out_err
 
 
-def parse_cell(cp2k_input_file):
+def parse_cell():
     """
     function: parse cell information from cp2k input file
     parameter:
@@ -15,24 +16,24 @@ def parse_cell(cp2k_input_file):
     return:
         cell: list with 6 number
     """
-    try:
-        with open(cp2k_input_file, 'r') as f:
-            cell = []
-            for line in f:
-                if "ABC" in line:
-                    xyz = line.split()[-3:]
-                    cell.extend(xyz)
-                if "ALPHA_BETA_GAMMA" in line:
-                    abc = line.split()[-3:]
-                    cell.extend(abc)
-            if len(cell) == 3:
-                cell.extend([90.0, 90.0, 90.0])
+    for file in os_operation.default_input:
+        try:
+            with open(file, 'r') as f:
+                cell = []
+                for line in f:
+                    if "ABC" in line:
+                        xyz = line.split()[-3:]
+                        cell.extend(xyz)
+                    if "ALPHA_BETA_GAMMA" in line:
+                        abc = line.split()[-3:]
+                        cell.extend(abc)
+                if len(cell) == 3:
+                    cell.extend([90.0, 90.0, 90.0])
 
-            print(f"system cell: x = {cell[0]}, y = {cell[1]}, z = {cell[2]}, a = {cell[3]}\u00B0, b = {cell[4]}\u00B0, c = {cell[5]}\u00B0")
-            return cell
-    except FileNotFoundError:
-        print(f'cp2k input file name "{cp2k_input_file}" is not found, assign a cp2k input file or assign a "cell"')
-        sys.exit(1)
+                out_err.cell_output(cell)
+                return cell
+        except FileNotFoundError:
+            sys.exit(f"cant parse cell information from {','.join(os_operation.default_input)}, assign a cell")
 
 
 #def get_cell(cp2k_input_file, cell=None):

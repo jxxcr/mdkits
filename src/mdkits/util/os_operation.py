@@ -33,3 +33,8 @@ def sort_word_and_number(unsort_list):
     sorted_list = sorted(unsort_list, key=fns)
 
     return sorted_list
+
+
+def default_input():
+    default_input_name = os.environ.get("DEFAULT_INPUT", "input.inp,setup.inp,cell.inc").split(',')
+    return default_input_name

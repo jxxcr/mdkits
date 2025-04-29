@@ -1,5 +1,8 @@
 import click, os
-from . import cp2k_input_parsing
+from ase.io import read
+import numpy as np
+from ase.collections import g2
+from mdkits.util import os_operation, cp2k_input_parsing, out_err
 
 
 class CellType(click.ParamType):
@@ -8,16 +11,17 @@ class CellType(click.ParamType):
     def convert(self, value, param, ctx):
         if isinstance(value, str):
             if ',' not in value:
-                cell = cp2k_input_parsing.parse_cell(value)
+                cell = cp2k_input_parsing.parse_cell()
                 return cell
             else:
                 cell = [float(x) for x in value.split(',')]
 
                 if len(cell) == 3:
-                    click.echo(f"system cell: x = {cell[0]}, y = {cell[1]}, z = {cell[2]}, a = {90}\u00B0, b = {90}\u00B0, c = {90}\u00B0")
-                    return cell + [90, 90, 90]
+                    cell += [90, 90, 90]
+                    out_err.cell_output(cell)
+                    return cell
                 elif len(cell) == 6:
-                    click.echo(f"system cell: x = {cell[0]}, y = {cell[1]}, z = {cell[2]}, a = {cell[3]}\u00B0, b = {cell[4]}\u00B0, c = {cell[5]}\u00B0")
+                    out_err.cell_output(cell)
                     return cell
                 else:
                     self.fail(f"{value} is not a valid cell parameter", param, ctx)
@@ -37,7 +41,27 @@ class FrameRangeType(click.ParamType):
                 self.fail(f"{value} is not a valid frame range", param, ctx)
 
 
-from ase.collections import g2
+class StructureType(click.ParamType):
+    name = "structure file type"
+    def convert(self, value, param, ctx):
+        no_cell=np.array([0., 0., 0., 90., 90., 90.])
+        if isinstance(value, str):
+            if os.path.exists(value):
+                try:
+                    atoms = read(value)
+                except:
+                    self.fail(f"{value} is not a valid structure file", param, ctx)
+
+                if np.array_equal(atoms.cell.cellpar(), no_cell):
+                    cell = cp2k_input_parsing.parse_cell()
+                    atoms.set_cell(cell)
+
+                return atoms
+            else:
+                self.fail(f"{value} is not exists", param, ctx)
+
+
+
 class MoleculeType(click.Choice):
     name = "mocular type"
     def __init__(self):
@@ -45,8 +69,17 @@ class MoleculeType(click.Choice):
         g2.names.append(click.Path(exists=True))
         self.choices = tuple(g2.names)
 
+class AdsSiteType(click.Choice):
+    name = "adsorption site"
+    def __init__(self):
+        super().__init__(self)
+        site = ['ontop', 'hollow','fcc', 'hcp', 'bridge', 'shortbridge', 'longbridge']
+        self.choices = tuple(site)
+
 
 
 Cell = CellType()
 FrameRange = FrameRangeType()
 Molecule = MoleculeType()
+AdsSite = AdsSiteType()
+Structure = StructureType()
