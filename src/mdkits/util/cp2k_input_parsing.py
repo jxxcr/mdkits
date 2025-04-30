@@ -16,7 +16,7 @@ def parse_cell():
     return:
         cell: list with 6 number
     """
-    for file in os_operation.default_input:
+    for file in os_operation.default_input():
         try:
             with open(file, 'r') as f:
                 cell = []
@@ -33,7 +33,7 @@ def parse_cell():
                 out_err.cell_output(cell)
                 return cell
         except FileNotFoundError:
-            sys.exit(f"cant parse cell information from {','.join(os_operation.default_input)}, assign a cell")
+            sys.exit(f"cant parse cell information from {','.join(os_operation.default_input())}, assign a cell")
 
 
 #def get_cell(cp2k_input_file, cell=None):

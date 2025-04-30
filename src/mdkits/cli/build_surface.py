@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-import click
+import click, os
 from ase import build
 import numpy as np
 
@@ -20,7 +20,7 @@ def surface_check(obj, surface_type):
 @click.option('--thickness', type=float, help='Thickness of the layer, for mx2 and graphene')
 @click.option('--orth', is_flag=True, help='if specified and true, forces the creation of a unit cell with orthogonal basis vectors. if the default is such a unit cell, this argument is not supported')
 @click.option('--vacuum', type=float, help='designate vacuum of surface, default is None', default=0.0)
-def main(symbol, surface, size, kind, a, c, thickness, orth, vacuum, adsorbate):
+def main(symbol, surface, size, kind, a, c, thickness, orth, vacuum):
     #if args.primitive:
     #    a = args.a * 0.7071 * 2
     #else:
@@ -28,7 +28,7 @@ def main(symbol, surface, size, kind, a, c, thickness, orth, vacuum, adsorbate):
 
     vacuum = vacuum / 2
     build_surface = surface_check(build, surface)
-    out_filename = f"{symbol}_{surface}_{size[0]}{size[1]}{size[2]}_{adsorbate}.cif"
+    out_filename = f"{symbol}_{surface}_{size[0]}{size[1]}{size[2]}.cif"
 
     if surface in ['hcp0001', 'hcp10m10']:
         atoms = build_surface(symbol, size, a=a, c=c, vacuum=vacuum, orthogonal=orth)
@@ -49,6 +49,7 @@ def main(symbol, surface, size, kind, a, c, thickness, orth, vacuum, adsorbate):
         atoms = build_surface(symbol, size, a=a, vacuum=vacuum, orthogonal=orth)
     
     atoms.write(out_filename)
+    print(os.path.abspath(out_filename))
 
 
 if __name__ == '__main__':

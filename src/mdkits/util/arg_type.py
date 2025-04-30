@@ -56,6 +56,7 @@ class StructureType(click.ParamType):
                     cell = cp2k_input_parsing.parse_cell()
                     atoms.set_cell(cell)
 
+                atoms.filename = value.replace('./', '').replace('.\\', '')
                 return atoms
             else:
                 self.fail(f"{value} is not exists", param, ctx)

@@ -8,6 +8,7 @@ from ase.io import iread, read
 import io
 import numpy as np
 from ase.io.cube import read_cube_data
+import MDAnalysis
 
 
 def wrap_to_cell(chunk, cell, name, big=False):
@@ -132,3 +133,14 @@ def jread(filepath):
         atom = read(filepath)
 
     return atom
+
+
+def atoms_to_u(atoms):
+    virtual_file = io.StringIO()
+    cell = atoms.cell.cellpar()
+    atoms.write(virtual_file, format='xyz')
+
+    u = MDAnalysis.Universe(virtual_file, format='xyz')
+    u.dimensions = cell
+
+    return u

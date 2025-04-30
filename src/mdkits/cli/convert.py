@@ -7,6 +7,7 @@ from mdkits.util import encapsulated_ase, arg_type
 
 
 @click.command(name='convert')
+@click.argument('atoms', type=arg_type.Structure)
 @click.option('-c', help='covert to cif', is_flag=True)
 @click.option('-x', help='covert to xyz', is_flag=True)
 @click.option('-d', help='covert to lammps data file', is_flag=True)
@@ -14,14 +15,12 @@ from mdkits.util import encapsulated_ase, arg_type
 @click.option('--coord', help='coord format', is_flag=True)
 @click.option('--cp2k', help='convert to cp2k format(coord + cell)', is_flag=True)
 @click.option('--center', help='center atoms', is_flag=True)
-@click.option('--cell', type=arg_type.Cell, help='set cell from cp2k input file or a list of lattice: --cell x,y,z or x,y,z,a,b,c', default='input.inp', show_default=True)
+@click.option('--cell', type=arg_type.Cell, help='set cell from cp2k input file or a list of lattice: --cell x,y,z or x,y,z,a,b,c')
 @click.option('-o', type=str, help='specify the output file name without suffix', default='out', show_default=True)
-@click.argument('file_name', type=click.Path(exists=True))
-def main(c, x, d, v, coord, cp2k, center, cell, o, file_name):
+def main(atoms, c, x, d, v, coord, cp2k, center, cell, o):
     """
     convet structure file in some formats
     """
-    atoms = encapsulated_ase.atoms_read_with_cell(file_name, cell=cell, coord_mode=coord)
 
     if center:
         atoms.center()
