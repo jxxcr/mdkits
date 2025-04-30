@@ -10,21 +10,17 @@ class CellType(click.ParamType):
 
     def convert(self, value, param, ctx):
         if isinstance(value, str):
-            if ',' not in value:
-                cell = cp2k_input_parsing.parse_cell()
+            cell = [float(x) for x in value.split(',')]
+
+            if len(cell) == 3:
+                cell += [90, 90, 90]
+                out_err.cell_output(cell)
+                return cell
+            elif len(cell) == 6:
+                out_err.cell_output(cell)
                 return cell
             else:
-                cell = [float(x) for x in value.split(',')]
-
-                if len(cell) == 3:
-                    cell += [90, 90, 90]
-                    out_err.cell_output(cell)
-                    return cell
-                elif len(cell) == 6:
-                    out_err.cell_output(cell)
-                    return cell
-                else:
-                    self.fail(f"{value} is not a valid cell parameter", param, ctx)
+                self.fail(f"{value} is not a valid cell parameter", param, ctx)
 
 
 class FrameRangeType(click.ParamType):
