@@ -33,7 +33,7 @@ def parse_cell():
                 out_err.cell_output(cell)
                 return cell
         except FileNotFoundError:
-            sys.exit(f"cant parse cell information from {','.join(os_operation.default_input())}, assign a cell")
+            return [0., 0., 0., 90., 90., 90.]
 
 
 #def get_cell(cp2k_input_file, cell=None):
