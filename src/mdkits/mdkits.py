@@ -1,4 +1,5 @@
 import click
+from mdkits.build_cli import build_cli
 from mdkits.cli import (
     convert,
     wrap,
@@ -8,7 +9,6 @@ from mdkits.cli import (
     density,
     cube,
     pdos,
-    build_cli,
 )
 
 

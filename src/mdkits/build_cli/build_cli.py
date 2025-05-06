@@ -1,8 +1,14 @@
 import click
-from mdkits.cli import (
+#from mdkits.cli.build import (
+#    build_bulk,
+#    build_surface,
+#    adsorbate,
+#)
+from mdkits.build_cli import (
     build_bulk,
     build_surface,
     adsorbate,
+    build_solution,
 )
 
 
@@ -16,6 +22,7 @@ def cli_build(ctx):
 cli_build.add_command(build_bulk.main)
 cli_build.add_command(build_surface.main)
 cli_build.add_command(adsorbate.main)
+cli_build.add_command(build_solution.main)
 
 if __name__ == '__main__':
     cli_build()
