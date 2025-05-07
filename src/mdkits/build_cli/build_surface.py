@@ -19,7 +19,7 @@ def surface_check(obj, surface_type):
 @click.option('-c', type=float, help='extra hcp lattice constant. if specified, it overrides the expermental lattice constant of the element. Default is ideal ratio: sqrt(8/3)', default=np.sqrt(8/3), show_default=True)
 @click.option('--thickness', type=float, help='Thickness of the layer, for mx2 and graphene')
 @click.option('--orth', is_flag=True, help='if specified and true, forces the creation of a unit cell with orthogonal basis vectors. if the default is such a unit cell, this argument is not supported')
-@click.option('--vacuum', type=float, help='designate vacuum of surface, default is None', default=0.0)
+@click.option('--vacuum', type=float, help='designate vacuum of surface, default is None', default=0.0, show_default=True)
 def main(symbol, surface, size, kind, a, c, thickness, orth, vacuum):
     #if args.primitive:
     #    a = args.a * 0.7071 * 2

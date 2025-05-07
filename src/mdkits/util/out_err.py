@@ -11,7 +11,9 @@ def cell_output(cell: list):
 
 
 def check_cell(atoms, cell):
-    if np.array_equal(atoms.cell.cellpar(), np.array([0., 0., 0., 90., 90., 90.])) and cell is not None:
+    if not np.array_equal(atoms.cell.cellpar(), np.array([0., 0., 0., 90., 90., 90.])):
+        cell_output(atoms.cell.cellpar())
+    elif np.array_equal(atoms.cell.cellpar(), np.array([0., 0., 0., 90., 90., 90.])) and cell is not None:
         atoms.set_cell(cell)
     else:
         raise ValueError("can't parse cell please use --cell set cell")

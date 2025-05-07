@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-import click
+import click, os
 from ase.build import bulk
 import numpy as np
 
@@ -27,7 +27,9 @@ def main(symbol, cs, a, b, c, alpha, covera, u, orth, cubic):
     #    a = args.a
     atoms = bulk(symbol, cs, a=a, b=b, c=c, alpha=alpha, covera=covera, u=u, orthorhombic=orth, cubic=cubic)
 
-    atoms.write(f"{symbol}_{cs}.cif", format='cif')
+    o = f"{symbol}_{cs}.cif"
+    atoms.write(o, format='cif')
+    print(os.path.abspath(o))
 
 
 if __name__ == '__main__':
