@@ -16,12 +16,12 @@ from mdkits.util import out_err, arg_type
 @click.option('--cp2k', help='convert to cp2k format(coord + cell)', is_flag=True)
 @click.option('--center', help='center atoms', is_flag=True)
 @click.option('--cell', type=arg_type.Cell, help='set cell, a list of lattice: --cell x,y,z or x,y,z,a,b,c')
-@click.option('-o', type=str, help='specify the output file name without suffix', default='out', show_default=True)
-def main(atoms, c, x, d, v, cp2k, center, cell, o):
+def main(atoms, c, x, d, v, coord, cp2k, center, cell):
     """
     convet structure file in some formats
     """
     out_err.check_cell(atoms, cell)
+    o = atoms.filename.split('.')[-2]
 
 
     if center:
