@@ -11,6 +11,7 @@ from mdkits.build_cli import (
     build_solution,
     cut_surface,
     supercell,
+    build_interface,
 )
 
 
@@ -27,6 +28,7 @@ cli_build.add_command(adsorbate.main)
 cli_build.add_command(build_solution.main)
 cli_build.add_command(cut_surface.main)
 cli_build.add_command(supercell.main)
+cli_build.add_command(build_interface.main)
 
 if __name__ == '__main__':
     cli_build()

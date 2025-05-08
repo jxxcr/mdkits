@@ -1,59 +1,43 @@
-from ase.io import write, read
-import argparse
-from ase.geometry import cell_to_cellpar, cellpar_to_cell
-import math
+import click
+from mdkits.util import arg_type, out_err
 
 
-def parse_argument():
-    parser = argparse.ArgumentParser(description='combain solbox and surface to a interface')
-    parser.add_argument('--surface', type=str, help='surface path')
-    parser.add_argument('--sol', type=str, help='solbox path')
-    parser.add_argument('--move', type=float, help='move at z, default = 0', default=0)
-    parser.add_argument('--interval', type=float, help='interval between surface to sol, default is 2', default=2)
-    parser.add_argument('--vacuum', type=float, help='vacuum of structure, default is 0', default=0)
-    parser.add_argument('--symmetry', help='two side interface, default is false', action='store_true')
-    parser.add_argument('--ne', help='two side interface, one side is Ne atom, default is false', action='store_true')
-    parser.add_argument('-o', type=str, help='output file name', default='interface')
+@click.command(name="interface")
+@click.option('--surface', type=arg_type.Structure, help='surface')
+@click.option('--sol', type=arg_type.Structure, help='solution')
+@click.option('--interval', type=float, help='interval between surface and sol', default=2, show_default=True)
+@click.option('--symmetry', is_flag=True, help='build symmetry interface')
+@click.option('--ne', type=float, help='add vacuum and Ne as gas phase', default=0, show_default=True)
+def main(surface, sol, interval, symmetry, ne):
+    """build interface"""
+    out_err.check_cell(surface)
+    out_err.check_cell(sol)
 
-    return parser.parse_args()
+    o = f"{surface.filename.split('.')[-2]}_{sol.filename.split('.')[-2]}.cif"
 
-
-def chformat(input_filename, output_filename, format):
-    atoms = read(input_filename)
-    write(output_filename, atoms, format=format)
-
-
-def main():
-    args = parse_argument()
-    surface = read(args.surface)
     surface.set_pbc(True)
     surface.center()
-    sy_surface = surface.copy()
-    cell = surface.get_cell()
-    [lenx, leny, lenz, anga, angb, angc] = cell_to_cellpar(cell)
+    surface_cell = surface.cell.cellpar()
+    init_surface_cell = surface.cell.cellpar()
 
-    solbox = read(args.sol)
-    solbox_cell = solbox.cell.cellpar()
-    solbox.set_pbc(True)
-    solbox.center()
-    tmp_list = solbox.get_positions()
-    tmp_list[:, 2] += lenz + args.interval
-    solbox.set_positions(tmp_list)
+    sol_cell = sol.cell.cellpar()
+    sol.set_pbc(True)
+    sol.center()
+    sol.positions += surface[2] + interval
 
-    surface.extend(solbox)
-    surface.cell = [lenx, leny, (lenz + args.interval + solbox_cell[2] + args.interval), anga, angb, angc]
+    surface.extend(sol)
+    surface_cell[2] += 2 * interval + sol_cell[2]
+    surface.set_cell(surface_cell)
     surface.center()
 
-    if args.symmetry:
-        tmp_list = surface.get_positions()
-        tmp_list[:, 2] += -(lenz + args.interval + solbox_cell[2] + args.interval)
-        surface.set_positions(tmp_list)
-        surface.extend(sy_surface)
-        surface.cell = [lenx, leny, (lenz + args.interval + solbox_cell[2] + args.interval + lenz + args.vacuum), anga, angb, angc]
+    if symmetry:
+        surface.positions -= 0.5 * init_surface_cell[2]
         surface.center()
-    elif args.ne:
+    elif ne > 0:
         from ase import Atoms
-        ne_interval = 4 # adjust water density
+        ne_interval = 4
+        lenx = init_surface_cell[0]
+        leny = init_surface_cell[1]
         ne_cell = [lenx, leny, 2, 90, 90, 90]
         ne_position = []
         ne_symbols = []
@@ -64,23 +48,14 @@ def main():
                 ne_symbols.append('Ne')
         ne_atoms = Atoms(symbols=ne_symbols, positions=ne_position, cell=ne_cell)
         ne_atoms.center()
-        tmp_list = surface.get_positions()
-        tmp_list[:, 2] += -(lenz + args.interval + solbox_cell[2])
-        surface.set_positions(tmp_list)
+
+        surface.positions += -(surface_cell[2])
         surface.extend(ne_atoms)
-        surface.cell = [lenx, leny, (lenz + args.interval + solbox_cell[2] + args.interval + 2 + args.vacuum), anga, angb, angc]
+        surface_cell[2] += ne_cell[2]
+        surface.set_cell(surface_cell)
         surface.center()
-    else:
-        surface.set_pbc(True)
-        tmp_list = surface.get_positions()
-        #tmp_list[:, 2] -= lenz
-        tmp_list[:, 2] -= args.move
-        surface.set_positions(tmp_list)
 
-
-    write(args.o + '.xyz', surface, format='extxyz')
-    write(args.o + '.cif', surface, format='cif')
-    #chformat(args.o + '.cif', args.o + '.xyz', format='xyz')
+    surface.write(o)
 
 if __name__ == '__main__':
     main()
