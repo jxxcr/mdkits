@@ -5,6 +5,34 @@ import click, os
 from mdkits.util import arg_type, out_err
 from mdkits.build_cli import supercell
 import numpy as np
+import ase.visualize
+
+
+def find_vector(atoms):
+    position = atoms.positions
+    max_z = np.max(position[:, 2])
+    highest_points = position[position[:, 2] == max_z]
+
+    shortest_vector = None
+    min_distance = float('inf')
+    x_axis = np.array([1, 0, 0])
+
+    for i in range(len(highest_points)):
+        for j in range(i + 1, len(highest_points)):
+            point1 = highest_points[i]
+            point2 = highest_points[j]
+            vector = point2 - point1
+
+            cos_angle = np.dot(vector, x_axis) / (np.linalg.norm(vector) * np.linalg.norm(x_axis))
+            angle = np.arccos(cos_angle)
+
+            if angle <= np.pi / 2:
+                distance = np.linalg.norm(vector)
+                if distance < min_distance:
+                    min_distance = distance
+                    shortest_vector = vector
+
+    return shortest_vector
 
 
 @click.command(name='cut')
@@ -17,20 +45,30 @@ import numpy as np
 def main(atoms, face, vacuum, size, cell, orth):
     """cut surface"""
     out_err.check_cell(atoms, cell)
+    o = f"{atoms.filename.split('.')[-2]}_{face[0]}{face[1]}{face[2]}_{size[0]}{size[1]}{size[2]}.cif"
 
     surface = build.surface(atoms, face, size[2], vacuum=vacuum/2)
-    super_surface = supercell.supercell(surface, size[0], size[1], 1)
 
     if orth:
-        super_surface_cell = super_surface.cell.cellpar()
-        gamma = super_surface_cell[-1]
+        #vector = surface[-2].position - surface[-1].position
+        #vector = find_vector(surface)
+        surface_cell = surface.cell.cellpar()
+        ase.visualize.view(surface)
+        gamma = surface_cell[-1]
         if gamma != 90:
-            b = np.sin(np.radians(gamma)) * super_surface_cell[1]
-            super_surface_cell[1] = b
-            super_surface_cell[-1] = 90
-            super_surface.set_cell(super_surface_cell)
+            a = np.sin(np.radians(gamma)) * surface_cell[0]
+            b = surface_cell[1]
+            surface_cell[1] = a
+            surface_cell[0] = b
+            surface_cell[-1] = 90
+            #surface.rotate(vector, np.array([1, 0, 0]))
+            surface.rotate(-gamma, 'z')
+            surface.set_cell(surface_cell)
+            surface.wrap()
+        o = f"{atoms.filename.split('.')[-2]}_{face[0]}{face[1]}{face[2]}_{size[0]}{size[1]}{size[2]}_orth.cif"
 
-    o = f"{atoms.filename.split('.')[-2]}_{face[0]}{face[1]}{face[2]}_{size[0]}{size[1]}{size[2]}.cif"
+    super_surface = supercell.supercell(surface, size[0], size[1], 1)
+
     super_surface.write(o)
     out_err.cell_output(super_surface.cell.cellpar())
     out_err.path_output(o)
