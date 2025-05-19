@@ -3,6 +3,7 @@
 import click, os
 from ase import build
 import numpy as np
+from mdkits.util import out_err
 
 
 def surface_check(obj, surface_type):
@@ -19,7 +20,7 @@ def surface_check(obj, surface_type):
 @click.option('-c', type=float, help='extra hcp lattice constant. if specified, it overrides the expermental lattice constant of the element. Default is ideal ratio: sqrt(8/3)', default=np.sqrt(8/3), show_default=True)
 @click.option('--thickness', type=float, help='Thickness of the layer, for mx2 and graphene')
 @click.option('--orth', is_flag=True, help='if specified and true, forces the creation of a unit cell with orthogonal basis vectors. if the default is such a unit cell, this argument is not supported')
-@click.option('--vacuum', type=float, help='designate vacuum of surface, default is None', default=0.0, show_default=True)
+@click.option('--vacuum', type=float, help='designate vacuum of surface, default is None', default=0.1, show_default=True)
 def main(symbol, surface, size, kind, a, c, thickness, orth, vacuum):
     #if args.primitive:
     #    a = args.a * 0.7071 * 2
@@ -29,6 +30,8 @@ def main(symbol, surface, size, kind, a, c, thickness, orth, vacuum):
     vacuum = vacuum / 2
     build_surface = surface_check(build, surface)
     out_filename = f"{symbol}_{surface}_{size[0]}{size[1]}{size[2]}.cif"
+    if surface in ['fcc100']:
+        orth = True
 
     if surface in ['hcp0001', 'hcp10m10']:
         atoms = build_surface(symbol, size, a=a, c=c, vacuum=vacuum, orthogonal=orth)
@@ -48,6 +51,7 @@ def main(symbol, surface, size, kind, a, c, thickness, orth, vacuum):
     else:
         atoms = build_surface(symbol, size, a=a, vacuum=vacuum, orthogonal=orth)
     
+    out_err.check_cell(atoms)
     atoms.write(out_filename)
     print(os.path.abspath(out_filename))
 

@@ -3,41 +3,42 @@ from mdkits.util import arg_type, out_err
 
 
 @click.command(name="interface")
-@click.option('--surface', type=arg_type.Structure, help='surface')
+@click.option('--slab', type=arg_type.Structure, help='surface')
 @click.option('--sol', type=arg_type.Structure, help='solution')
 @click.option('--interval', type=float, help='interval between surface and sol', default=2, show_default=True)
-@click.option('--symmetry', is_flag=True, help='build symmetry interface')
-@click.option('--ne', type=float, help='add vacuum and Ne as gas phase', default=0, show_default=True)
-def main(surface, sol, interval, symmetry, ne):
+@click.option('--cap', type=click.Choice(['ne', 'slab']), help='build slab interface')
+@click.option('--vacuum', type=float, help='vacuum length', default=0, show_default=True)
+def main(slab, sol, interval, cap, vacuum):
     """build interface"""
-    out_err.check_cell(surface)
+    out_err.check_cell(slab)
     out_err.check_cell(sol)
 
-    o = f"{surface.filename.split('.')[-2]}_{sol.filename.split('.')[-2]}.cif"
+    o = f"{slab.filename.split('.')[-2]}_{sol.filename.split('.')[-2]}.cif"
 
-    surface.set_pbc(True)
-    surface.center()
-    surface_cell = surface.cell.cellpar()
-    init_surface_cell = surface.cell.cellpar()
+    slab.set_pbc(True)
+    slab.center()
+    slab_cell = slab.cell.cellpar()
+    init_slab_cell = slab.cell.cellpar()
+    if cap == 'slab':
+        slab_copy = slab.copy()
 
     sol_cell = sol.cell.cellpar()
     sol.set_pbc(True)
     sol.center()
-    sol.positions += surface[2] + interval
+    sol.positions[:, 2] += slab_cell[2] + interval
 
-    surface.extend(sol)
-    surface_cell[2] += 2 * interval + sol_cell[2]
-    surface.set_cell(surface_cell)
-    surface.center()
+    slab.extend(sol)
+    slab_cell[2] += 2 * interval + sol_cell[2]
+    slab.set_cell(slab_cell)
+    slab.center()
 
-    if symmetry:
-        surface.positions -= 0.5 * init_surface_cell[2]
-        surface.center()
-    elif ne > 0:
+    if cap is None:
+        slab.positions[:, 2] -= 0.5 * init_slab_cell[2]
+    elif cap == 'ne':
         from ase import Atoms
         ne_interval = 4
-        lenx = init_surface_cell[0]
-        leny = init_surface_cell[1]
+        lenx = init_slab_cell[0]
+        leny = init_slab_cell[1]
         ne_cell = [lenx, leny, 2, 90, 90, 90]
         ne_position = []
         ne_symbols = []
@@ -49,13 +50,25 @@ def main(surface, sol, interval, symmetry, ne):
         ne_atoms = Atoms(symbols=ne_symbols, positions=ne_position, cell=ne_cell)
         ne_atoms.center()
 
-        surface.positions += -(surface_cell[2])
-        surface.extend(ne_atoms)
-        surface_cell[2] += ne_cell[2]
-        surface.set_cell(surface_cell)
-        surface.center()
+        slab.positions[:, 2] += -(slab_cell[2] + interval)
+        slab.extend(ne_atoms)
+        slab_cell[2] += ne_cell[2]
+        slab.set_cell(slab_cell)
+        slab.center()
+    elif cap == 'slab':
+        slab.positions[:, 2] += -(slab_cell[2] + interval)
+        slab.extend(slab_copy)
+        slab_cell[2] += slab_copy.cell.cellpar()[2]
+        slab.set_cell(slab_cell)
+        slab.center()
+    
+    if vacuum > 0:
+        slab_cell[2] += vacuum
+        slab.set_cell(slab_cell)
 
-    surface.write(o)
+
+    slab.write(o)
+    out_err.path_output(o)
 
 if __name__ == '__main__':
     main()

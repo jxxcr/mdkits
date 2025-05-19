@@ -2,6 +2,7 @@ import click, os
 from julia import Pkg, Main
 from mdkits.util import arg_type
 from importlib import resources
+from mdkits.cli import convert
 import tempfile
 
 
@@ -77,6 +78,10 @@ def main(filename, infile, install, water_number, n, tolerance, cell, gap):
         if os.path.exists(temp_file.name):
             os.remove(temp_file.name)
 
+    print("="*15)
+    print(total_input)
+    print("="*15)
+    convert.main([output_filename, "-c", "--cell", ",".join([str(a) for a in cell])], standalone_mode=False)
     Main.exit()
 
 
