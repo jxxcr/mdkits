@@ -62,9 +62,8 @@ class StructureType(click.ParamType):
 class MoleculeType(click.Choice):
     name = "mocular type"
     def __init__(self):
-        super().__init__(self)
         g2.names.append(click.Path(exists=True))
-        self.choices = tuple(g2.names)
+        super().__init__(choices=tuple(g2.names))
 
 class AdsSiteType(click.Choice):
     name = "adsorption site"
