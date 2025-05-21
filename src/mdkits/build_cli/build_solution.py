@@ -1,5 +1,4 @@
 import click, os
-from julia import Pkg, Main
 from mdkits.util import arg_type
 from importlib import resources
 from mdkits.cli import convert
@@ -25,6 +24,8 @@ def main(filename, infile, install, water_number, n, tolerance, cell, gap):
         Pkg.activate("Packmol", shared=True)
         Pkg.add("Packmol")
         Main.exit()
+    else:
+        from julia import Pkg, Main
 
     if cell is None:
         raise ValueError("cell should be provided")
