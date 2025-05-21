@@ -68,9 +68,8 @@ class MoleculeType(click.Choice):
 class AdsSiteType(click.Choice):
     name = "adsorption site"
     def __init__(self):
-        super().__init__(self)
         site = ['ontop', 'hollow','fcc', 'hcp', 'bridge', 'shortbridge', 'longbridge']
-        self.choices = tuple(site)
+        super().__init__(choices=tuple(site))
 
 
 
