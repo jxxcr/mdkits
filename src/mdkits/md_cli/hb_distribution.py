@@ -5,13 +5,13 @@ import click
 import MDAnalysis
 from MDAnalysis import Universe
 from MDAnalysis.analysis.base import AnalysisBase
-from mdkits.util import arg_type, os_operation, numpy_geo
+from mdkits.util import arg_type, os_operation, numpy_geo, encapsulated_mda
 import warnings, sys
 warnings.filterwarnings("ignore")
 
 
 class Hb_distribution(AnalysisBase):
-    def __init__(self, filename, cell, surface, hb_distance, hb_angle=35, bin_size=0.2, dt=0.001, index=None):
+    def __init__(self, filename, cell, surface, update_water, distance_judg, angle_judg, hb_distance, hb_angle, bin_size=0.2, dt=0.001, index=None):
         u = Universe(filename)
         u.trajectory.ts.dt = dt
         u.dimensions = cell
@@ -21,6 +21,7 @@ class Hb_distribution(AnalysisBase):
         self.hb_angle = hb_angle
         self.bin_size = bin_size
         self.surface = surface
+        self.update_water = update_water
         self.frame_count = 0
         np.set_printoptions(threshold=np.inf)
 
@@ -30,6 +31,10 @@ class Hb_distribution(AnalysisBase):
                 sys.exit("Please specify the correct surface group")
         else:
             self.surface_group = False
+
+        if self.update_water:
+            self.distance_judg = distance_judg
+            self.angle_judg = angle_judg
         
         if index is not None:
             self.index = index
@@ -62,16 +67,32 @@ class Hb_distribution(AnalysisBase):
         np.add.at(self.od, bins_o, 1)
 
     def _single_frame(self):
-        o_group = self.atomgroup.select_atoms("name O")
-        o_pair = MDAnalysis.lib.distances.capped_distance(o_group.positions, o_group.positions, min_cutoff=0, max_cutoff=self.hb_distance, box=self.u.dimensions, return_distances=False)
+        if self.update_water:
+            o = self.atomgroup.select_atoms("name O")
+            h = self.atomgroup.select_atoms("name H")
 
-        o0 = o_group[o_pair[:, 0]]
-        o1 = o_group[o_pair[:, 1]]
+            o_group, oh1, oh2 = encapsulated_mda.update_water(self, o, h, distance_judg=self.distance_judg, angle_judg=self.angle_judg, return_index=False)
 
-        o0h1 = self.atomgroup[o0.indices + 1]
-        o0h2 = self.atomgroup[o0.indices + 2]
-        o1h1 = self.atomgroup[o1.indices + 1]
-        o1h2 = self.atomgroup[o1.indices + 2]
+            o_pair = MDAnalysis.lib.distances.capped_distance(o_group.positions, o_group.positions, min_cutoff=0, max_cutoff=self.hb_distance, box=self.u.dimensions, return_distances=False)
+
+            o0 = o_group[o_pair[:, 0]]
+            o1 = o_group[o_pair[:, 1]]
+
+            o0h1 = oh1[o_pair[:, 0]]
+            o0h2 = oh2[o_pair[:, 0]]
+            o1h1 = oh1[o_pair[:, 1]]
+            o1h2 = oh2[o_pair[:, 1]]
+        else:
+            o_group = self.atomgroup.select_atoms("name O")
+            o_pair = MDAnalysis.lib.distances.capped_distance(o_group.positions, o_group.positions, min_cutoff=0, max_cutoff=self.hb_distance, box=self.u.dimensions, return_distances=False)
+
+            o0 = o_group[o_pair[:, 0]]
+            o1 = o_group[o_pair[:, 1]]
+
+            o0h1 = self.atomgroup[o0.indices + 1]
+            o0h2 = self.atomgroup[o0.indices + 2]
+            o1h1 = self.atomgroup[o1.indices + 1]
+            o1h2 = self.atomgroup[o1.indices + 2]
 
         angle_o0h1_o0_o1 = np.degrees(
             MDAnalysis.lib.distances.calc_angles(o0h1.positions, o0.positions, o1.positions, box=self.u.dimensions)
@@ -89,8 +110,6 @@ class Hb_distribution(AnalysisBase):
         condition_d = (angle_o0h1_o0_o1 < self.hb_angle) | (angle_o0h2_o0_o1 < self.hb_angle)
         condition_a = (angle_o1h1_o1_o0 < self.hb_angle) | (angle_o1h2_o1_o0 < self.hb_angle)
 
-        #hb_d = (o0.positions[:, 2][condition_d] + o1.positions[:, 2][condition_d]) / 2
-        #hb_a = (o0.positions[:, 2][condition_a] + o1.positions[:, 2][condition_a]) / 2
         if self.index is not None:
             self.hb_d_index += o0.positions[:, 2][condition_d & (o0.indices == self.index)].shape[0]
             self.hb_a_index += o0.positions[:, 2][condition_a & (o0.indices == self.index)].shape[0]
@@ -131,8 +150,12 @@ class Hb_distribution(AnalysisBase):
             np.savetxt("hb_distribution.dat", combined_data, header="Z\tAccepter\tDonor\tAccepter+Donor", fmt='%.5f', delimiter='\t')
 
         if self.index is not None and self.frame_count > 0:
-            print(f"hb_d_index: {self.hb_d_index/self.frame_count}")
-            print(f"hb_a_index: {self.hb_a_index/self.frame_count}")
+            self.hb_d_index /= self.frame_count
+            self.hb_a_index /= self.frame_count
+            output = f"# {self.index}\naccepter     : {self.hb_a_index}\ndonor        : {self.hb_d_index}\ntotal        : {self.hb_a_index + self.hb_d_index}"
+            with open(f"hb_{self.index}.dat", "a") as f:
+                f.write(output)
+            print(output)
 
 
 @click.command(name="hb")
@@ -147,7 +170,7 @@ class Hb_distribution(AnalysisBase):
 @click.option('--index', type=int, help='index of an atom')
 def main(filename, hb_param, cell, surface, r, update_water, distance, angle, index):
 
-    hb_dist = Hb_distribution(filename, cell, surface, hb_distance=hb_param[0], hb_angle=hb_param[1], index=index)
+    hb_dist = Hb_distribution(filename, cell, surface, update_water=update_water, distance_judg=distance, angle_judg=angle, hb_distance=hb_param[0], hb_angle=hb_param[1], index=index)
 
     if r is not None:
         if len(r) == 2:
