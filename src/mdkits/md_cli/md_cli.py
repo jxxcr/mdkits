@@ -1,0 +1,19 @@
+import click
+from mdkits.md_cli import (
+    density,
+    hb_distribution,
+)
+
+
+@click.group(name='md')
+@click.pass_context
+def main(ctx):
+    """kits for MD analysis"""
+    pass
+
+main.add_command(density.main)
+main.add_command(hb_distribution.main)
+
+
+if __name__ == '__main__':
+    main()

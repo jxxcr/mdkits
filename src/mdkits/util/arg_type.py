@@ -14,10 +14,8 @@ class CellType(click.ParamType):
 
             if len(cell) == 3:
                 cell += [90, 90, 90]
-                out_err.cell_output(cell)
                 return cell
             elif len(cell) == 6:
-                out_err.cell_output(cell)
                 return cell
             else:
                 self.fail(f"{value} is not a valid cell parameter", param, ctx)

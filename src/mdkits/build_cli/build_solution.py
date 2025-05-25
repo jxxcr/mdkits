@@ -2,7 +2,7 @@ import click, os
 from mdkits.util import arg_type
 from importlib import resources
 from mdkits.cli import convert
-import tempfile, platform, subprocess
+import tempfile, platform, subprocess, sys
 
 
 @click.command(name="solution")
@@ -25,34 +25,29 @@ def main(filename, infile, install_julia, install_packmol, water_number, n, tole
         if os_name in ("Darwin", "Linux", "FreeBSD"):
             try:
                 subprocess.run(
-                ["curl", "-fsSL", "https://install.julialang.org", "|", "sh"],
+                ["curl -fsSL https://install.julialang.org | sh"],
                 shell=True,  
                 check=True,
             )
                 print("Julia installed (macOS, Linux, FreeBSD).")
+                sys.exit(1)
             except subprocess.CalledProcessError as e:
                 print(f"Julia install failed: {e}")
+                sys.exit(0)
         elif os_name == "Windows":
             try:
                 subprocess.run(
-                    [
-                        "winget",
-                        "install",
-                        "--name",
-                        "Julia",
-                        "--id",
-                        "9NJNWW8PVKMN",
-                        "-e",
-                        "-s",
-                        "msstore",
-                    ],
+                    ["winget", "install", "--name", "Julia", "--id", "9NJNWW8PVKMN", "-e", "-s", "msstore"],
                     check=True,
                 )
                 print("Julia installed (Windows).")
+                sys.exit(1)
             except subprocess.CalledProcessError as e:
                 print(f"Julia install failed: {e}")
+                sys.exit(0)
         else:
             print(f"unsupport os: {os_name}")
+            sys.exit(0)
 
     if install_packmol:
         import julia

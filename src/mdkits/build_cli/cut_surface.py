@@ -70,7 +70,7 @@ def main(atoms, face, vacuum, size, cell, orth):
     super_surface = supercell.supercell(surface, size[0], size[1], 1)
 
     super_surface.write(o)
-    out_err.cell_output(super_surface.cell.cellpar())
+    out_err.cell_output(super_surface)
     out_err.path_output(o)
 
 
