@@ -2,6 +2,7 @@ import click
 from mdkits.md_cli import (
     density,
     hb_distribution,
+    angle,
 )
 
 
@@ -13,6 +14,7 @@ def main(ctx):
 
 main.add_command(density.main)
 main.add_command(hb_distribution.main)
+main.add_command(angle.main)
 
 
 if __name__ == '__main__':

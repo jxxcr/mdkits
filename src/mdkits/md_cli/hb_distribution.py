@@ -120,7 +120,7 @@ class Hb_distribution(AnalysisBase):
             self._append(hb_d, hb_a, o_group.positions[:, 2])
 
         if self.surface_group:
-            lower_z, upper_z = numpy_geo.find_surface(self.surface_group.positions[:, 2], layer_tolerance=1, surface_tolerance=5)
+            lower_z, upper_z = numpy_geo.find_surface(self.surface_group.positions[:, 2])
             self.surface_pos[0] += lower_z
             self.surface_pos[1] += upper_z
 
@@ -169,7 +169,7 @@ class Hb_distribution(AnalysisBase):
 @click.option('--angle', type=(float, float), help='update water angle judgment')
 @click.option('--index', type=int, help='index of an atom')
 def main(filename, hb_param, cell, surface, r, update_water, distance, angle, index):
-
+    """analysis hydrogen bond distribution along z-axis"""
     hb_dist = Hb_distribution(filename, cell, surface, update_water=update_water, distance_judg=distance, angle_judg=angle, hb_distance=hb_param[0], hb_angle=hb_param[1], index=index)
 
     if r is not None:

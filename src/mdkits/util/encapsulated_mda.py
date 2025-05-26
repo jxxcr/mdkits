@@ -3,7 +3,7 @@ import numpy as np
 from . import numpy_geo
 
 
-def update_water(self, o_group, h_group, distance_judg=1.2, angle_judg:tuple[float, float]=None, return_index=False):
+def update_water(self, o_group, h_group, distance_judg=1.2, angle_judg:tuple[float, float]=(None, None), return_index=False):
     """
     input: o and h atom
     output: o and two h in this frame
@@ -53,6 +53,9 @@ def update_water(self, o_group, h_group, distance_judg=1.2, angle_judg:tuple[flo
     if return_index:
         return o_index, oh1_index, oh2_index
     else:
+        if len(o_index) == 0:
+            raise ValueError("No water found in this atom group")
+
         o = o_group[o_index]
         oh1 = h_group[oh1_index]
         oh2 = h_group[oh2_index]

@@ -75,7 +75,7 @@ class Density_distribution(AnalysisBase):
             self._append(o.positions[:, 2])
 
         else:
-            group = self.atomgroup.select_atoms(f"{self.element}")
+            group = self.atomgroup.select_atoms(f"{self.element}", updating=True)
             self._append(group.positions[:, 2])
 
         if self.surface_group:

@@ -9,7 +9,7 @@ import sys, os
 def cell_output(atoms):
     cell = atoms.cell.cellpar()
     if not hasattr(atoms, "name"):
-        atoms.name = ""
+        atoms.name = "present"
     print(f"{atoms.name} cell: x = {cell[0]}, y = {cell[1]}, z = {cell[2]}, a = {cell[3]}\u00B0, b = {cell[4]}\u00B0, c = {cell[5]}\u00B0")
 
 

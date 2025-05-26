@@ -45,7 +45,7 @@ def vector_between_two_vector(vector1, vector2):
 
 
 def vector_vector_angle(vector, surface_vector):
-    cos = np.dot(vector, surface_vector) / (np.linalg.norm(vector) * np.linalg.norm(surface_vector))
+    cos = np.dot(vector, surface_vector) / (np.linalg.norm(vector, axis=1) * np.linalg.norm(surface_vector))
     vector_vector_angle = np.arccos(np.clip(cos, -1.0, 1.0))
     vector_vector_angle = np.degrees(vector_vector_angle)
     return vector_vector_angle
@@ -96,7 +96,7 @@ def unwrap(atom1, atom2, coefficients, max=0, total=False):
         return min_dist, closest_point
 
 
-def find_surface(surface_group:np.ndarray, layer_tolerance=1, surface_tolerance=5):
+def find_surface(surface_group:np.ndarray, layer_tolerance=0.05, surface_tolerance=5):
     sort_group = np.sort(surface_group)
     layer_mean = []
     current_layer = [sort_group[0]]
@@ -108,12 +108,14 @@ def find_surface(surface_group:np.ndarray, layer_tolerance=1, surface_tolerance=
             current_layer = [sort_group[i]]
         layer_mean.append(np.mean(current_layer))
     
-    if len(current_layer) == 1:
-        return layer_mean[0]
+    if len(layer_mean) == 1:
+        return [layer_mean[0]]
 
     diff = np.diff(layer_mean)
     if np.any(diff > surface_tolerance):
-        index = np.argmax(diff > 5)
+        index = np.argmax(diff > surface_tolerance)
         return (layer_mean[index], layer_mean[index + 1])
     else:
+        if layer_mean[-1] > layer_mean[0]:
+            return [layer_mean[-1]]
         return (layer_mean[-1], layer_mean[0])
