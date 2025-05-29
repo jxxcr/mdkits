@@ -7,6 +7,7 @@ from MDAnalysis import Universe
 from MDAnalysis.analysis.base import AnalysisBase
 from mdkits.util import arg_type, os_operation, numpy_geo, encapsulated_mda
 import warnings, sys
+from .setting import common_setting
 warnings.filterwarnings("ignore")
 
 
@@ -158,15 +159,9 @@ class Hb_distribution(AnalysisBase):
             print(output)
 
 
-@click.command(name="hb")
-@click.argument('filename', type=click.Path(exists=True), default=os_operation.default_file_name('*-pos-1.xyz', last=True))
+@click.command(name="hb", help="analysis hydrogen bond distribution along z-axis")
+@common_setting
 @click.option('--hb_param', type=click.Tuple([float, float]), help='parameter for hydrogen bond', default=(3.5, 35), show_default=True)
-@click.option('--cell', type=arg_type.Cell, help='set cell, a list of lattice, --cell x,y,z or x,y,z,a,b,c')
-@click.option('--surface', type=str, help='surface element')
-@click.option('-r', type=arg_type.FrameRange, help='range of frame to analysis')
-@click.option('--update_water', is_flag=True, help='update water with distance or angle judgment')
-@click.option('--distance', type=float, help='update water distance judgment', default=1.2, show_default=True)
-@click.option('--angle', type=(float, float), help='update water angle judgment')
 @click.option('--index', type=int, help='index of an atom')
 def main(filename, hb_param, cell, surface, r, update_water, distance, angle, index):
     """analysis hydrogen bond distribution along z-axis"""

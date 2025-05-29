@@ -5,6 +5,7 @@ import MDAnalysis
 import sys
 from mdkits.util import numpy_geo, encapsulated_mda, arg_type
 import numpy as np
+from .setting import common_setting
 
 
 class Angle_distribution(AnalysisBase):
@@ -102,15 +103,9 @@ class Angle_distribution(AnalysisBase):
             np.savetxt("angle_distribution.dat", conbined_data, header="angle\tw_suf_dist\toh_suf_dist", fmt='%.5f', delimiter='\t')
 
 
-@click.command(name="angle")
-@click.argument("filename", type=click.Path(exists=True))
-@click.option('--cell', type=arg_type.Cell, help="set cell, a list of lattice, --cell x,y,z or x,y,z,a,b,c")
+@click.command(name="angle", help="analysis angle between normal vectors and OH vector or bisector")
+@common_setting
 @click.option("--water_height", type=float, help="water height from surface")
-@click.option("--surface", type=str, help="surface group")
-@click.option('--update_water', is_flag=True, help='update water with distance or angle judgment')
-@click.option('--distance', type=float, help='update water distance judgment', default=1.2, show_default=True)
-@click.option('--angle', type=(float, float), help='update water angle judgment')
-@click.option('-r', type=arg_type.FrameRange, help='range of frame to analysis')
 def main(filename, cell, water_height, update_water, distance, angle, surface, r):
     """analysis angle between normal vectors and OH vector or bisector"""
     a = Angle_distribution(filename, cell, water_height, update_water, distance_judg=distance, angle_judg=angle, surface=surface)

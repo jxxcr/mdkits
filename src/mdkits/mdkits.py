@@ -19,7 +19,7 @@ def cli(ctx):
     pass
 
 
-cli.add_command(md_cli.main)
+cli.add_command(md_cli.cli)
 cli.add_command(dft_cli.main)
 cli.add_command(build_cli.cli_build)
 cli.add_command(convert.main)

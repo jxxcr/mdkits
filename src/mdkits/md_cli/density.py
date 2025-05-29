@@ -10,6 +10,7 @@ from mdkits.util import (
     encapsulated_mda,
     os_operation,
 )
+from .setting import common_setting
 import warnings, sys
 warnings.filterwarnings("ignore")
 
@@ -79,7 +80,7 @@ class Density_distribution(AnalysisBase):
             self._append(group.positions[:, 2])
 
         if self.surface_group:
-            lower_z, upper_z = numpy_geo.find_surface(self.surface_group.positions[:, 2], layer_tolerance=1, surface_tolerance=5)
+            lower_z, upper_z = numpy_geo.find_surface(self.surface_group.positions[:, 2])
             self.surface_pos[0] += lower_z
             self.surface_pos[1] += upper_z
 
@@ -110,16 +111,11 @@ class Density_distribution(AnalysisBase):
 
             np.savetxt(self.o, conbined_data, header="Z\tdensity", fmt='%.5f', delimiter='\t')
 
-@click.command(name='density')
-@click.argument('filename', type=click.Path(exists=True), default=os_operation.default_file_name('*-pos-1.xyz', last=True))
-@click.option('--cell', type=arg_type.Cell, help='set cell from cp2k input file or a list of lattice: --cell x,y,z or x,y,z,a,b,c', default='input.inp', show_default=True)
-@click.option('--element', type=str, help='element to analysis')
+@click.command(name='density', help="analysis density or concentration of element in a trajectory file")
+@common_setting
+@click.option('--group', type=str, help='group to analysis')
 @click.option('--atomic_mass', type=float, help='output density unit (g/cm3), should give atomic mass of element, else is concentration unit (mol/L)')
 @click.option('-o', type=str, help='output file name', default='density_{element}.dat', show_default=True)
-@click.option('--update_water', is_flag=True, help='update water with distance or angle judgment')
-@click.option('--distance', type=float, help='update water distance judgment', default=1.2, show_default=True)
-@click.option('--angle', type=(float, float), help='update water angle judgment')
-@click.option('--surface', type=str, help='surface element')
 def main(filename, cell, o, element, atomic_mass, update_water, distance, angle, surface):
     """
     analysis density or concentration of element in a trajectory file
