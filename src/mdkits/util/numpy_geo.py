@@ -45,7 +45,10 @@ def vector_between_two_vector(vector1, vector2):
 
 
 def vector_vector_angle(vector, surface_vector):
-    cos = np.dot(vector, surface_vector) / (np.linalg.norm(vector, axis=1) * np.linalg.norm(surface_vector))
+    if len(vector.shape) == 1:
+        cos = np.dot(vector, surface_vector) / (np.linalg.norm(vector) * np.linalg.norm(surface_vector))
+    else:
+        cos = np.dot(vector, surface_vector) / (np.linalg.norm(vector, axis=1) * np.linalg.norm(surface_vector))
     vector_vector_angle = np.arccos(np.clip(cos, -1.0, 1.0))
     vector_vector_angle = np.degrees(vector_vector_angle)
     return vector_vector_angle

@@ -6,6 +6,7 @@ from mdkits.md_cli import (
     hb_distribution,
     rdf,
     msd,
+    monitor,
 )
 
 
@@ -20,6 +21,7 @@ cli.add_command(angle.main)
 cli.add_command(hb_distribution.main)
 cli.add_command(rdf.main)
 cli.add_command(msd.main)
+cli.add_command(monitor.main)
 
 
 if __name__ == '__main__':

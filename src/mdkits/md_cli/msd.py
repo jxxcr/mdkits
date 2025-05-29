@@ -9,6 +9,7 @@ import numpy as np
 @click.argument('type', type=click.Choice(['xyz', 'xy', 'yz', 'xz', 'x', 'y', 'z']))
 @click.argument("group", type=str)
 def main(filename, type, group):
+    """analysis msd along the given axis"""
     u = mda.Universe(filename)
     MSD = msd.EinsteinMSD(u, select=group, msd_type=type, fft=True)
     MSD.run(verbose=True)
