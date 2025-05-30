@@ -80,9 +80,10 @@ class Density_distribution(AnalysisBase):
             self._append(group.positions[:, 2])
 
         if self.surface_group:
-            lower_z, upper_z = numpy_geo.find_surface(self.surface_group.positions[:, 2])
-            self.surface_pos[0] += lower_z
-            self.surface_pos[1] += upper_z
+            surface = numpy_geo.find_surface(self.surface_group.positions[:, 2])
+            self.surface_pos[0] += surface[0]
+            if len(surface) > 1:
+                self.surface_pos[1] += surface[1]
 
         self.frame_count += 1
 
@@ -99,7 +100,8 @@ class Density_distribution(AnalysisBase):
 
             if self.surface:
                 lower_z = self.surface_pos[0] / self.frame_count
-                upper_z = self.surface_pos[1] / self.frame_count
+                if self.surface_pos[1] == 0:
+                    upper_z = np.inf
 
                 mask = (bins_z >= lower_z) & (bins_z <= upper_z)
                 filtered_bins_z = bins_z[mask] - lower_z

@@ -18,6 +18,7 @@ from mdkits.util import arg_type, encapsulated_ase, out_err
 @click.option('--offset', type=click.Tuple([float, float]), help='adjust site', default=(0, 0), show_default=True)
 @click.option("--cover", type=int, help='cover the surface with adsorbate randomly')
 def main(atoms, adsorbate, cell, select, height, rotate, offset, cover):
+    """add adsorbate molcule to the surface"""
     if height is None:
         raise ValueError("height is required")
 

@@ -28,7 +28,7 @@ def main(filename, o, cell):
             ag.wrap()
             W.write(ag)
 
-    click.echo("\nwrap is done, output file {o} is:")
+    click.echo(f"\nwrap is done, output file {o} is:")
     click.echo(os.path.abspath(o))
 
 

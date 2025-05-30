@@ -121,23 +121,27 @@ class Hb_distribution(AnalysisBase):
             self._append(hb_d, hb_a, o_group.positions[:, 2])
 
         if self.surface_group:
-            lower_z, upper_z = numpy_geo.find_surface(self.surface_group.positions[:, 2])
-            self.surface_pos[0] += lower_z
-            self.surface_pos[1] += upper_z
+            surface = numpy_geo.find_surface(self.surface_group.positions[:, 2])
+            self.surface_pos[0] += surface[0]
+            if len(surface) > 1:
+                self.surface_pos[1] += surface[1]
 
         self.frame_count += 1
 
     def _conclude(self):
         if self.frame_count > 0 and self.index is None:
             average_od = self.od / self.frame_count
-            average_donor = (self.donor / self.frame_count) / average_od
-            average_accepter = (self.accepter / self.frame_count) / average_od
+            average_donor = np.nan_to_num((self.donor / self.frame_count) / average_od, nan=0)
+            average_accepter = np.nan_to_num((self.accepter / self.frame_count) / average_od, nan=0)
             average_sum = average_donor + average_accepter
 
             bins_z = np.arange(len(self.donor)) * self.bin_size
 
             if self.surface:
-                lower_z, upper_z = self.surface_pos/self.frame_count
+                surface = self.surface_pos/self.frame_count
+                lower_z = surface[0]
+                if surface[1] ==0:
+                    upper_z = np.inf
                 mask = (bins_z >= lower_z) & (bins_z <= upper_z)
                 filtered_bins_z = bins_z[mask] - lower_z
                 filtered_average_accepter = average_accepter[mask]

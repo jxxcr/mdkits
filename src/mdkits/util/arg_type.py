@@ -6,7 +6,7 @@ from mdkits.util import os_operation, cp2k_input_parsing, out_err
 
 
 class CellType(click.ParamType):
-    name = "pbc cell type"
+    name = "cell type"
 
     def convert(self, value, param, ctx):
         if isinstance(value, str):
@@ -36,7 +36,7 @@ class FrameRangeType(click.ParamType):
 
 
 class StructureType(click.ParamType):
-    name = "structure file type"
+    name = "structure type"
     def convert(self, value, param, ctx):
         no_cell=np.array([0., 0., 0., 90., 90., 90.])
         if isinstance(value, str):

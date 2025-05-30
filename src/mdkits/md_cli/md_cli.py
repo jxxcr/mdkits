@@ -1,5 +1,6 @@
 import click
 from mdkits.md_cli import (
+    wrap,
     dipole,
     angle,
     density,
@@ -15,6 +16,7 @@ from mdkits.md_cli import (
 def cli(ctx):
     """kits for MD analysis"""
 
+cli.add_command(wrap.main)
 cli.add_command(density.main)
 cli.add_command(dipole.main)
 cli.add_command(angle.main)

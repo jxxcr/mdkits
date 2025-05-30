@@ -22,10 +22,7 @@ def surface_check(obj, surface_type):
 @click.option('--orth', is_flag=True, help='if specified and true, forces the creation of a unit cell with orthogonal basis vectors. if the default is such a unit cell, this argument is not supported')
 @click.option('--vacuum', type=float, help='designate vacuum of surface, default is None', default=0.1, show_default=True)
 def main(symbol, surface, size, kind, a, c, thickness, orth, vacuum):
-    #if args.primitive:
-    #    a = args.a * 0.7071 * 2
-    #else:
-    #    a = args.a
+    """build a common surface"""
 
     vacuum = vacuum / 2
     build_surface = surface_check(build, surface)
