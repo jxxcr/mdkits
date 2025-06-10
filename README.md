@@ -94,6 +94,13 @@ mdkits md wrap [FILENAME] --cell 10,10,10
 ```
 默认的`[FILENAME]`为`*-pos-1.xyz`
 
+### 振动态密度(VDOS)
+`vac`用于分析轨迹的速度自相关函数, 同时计算速度自相关函数的傅里叶变换, 即振动动态密度(VDOS), 如分析体系中的VDOS:
+```bash
+mdkits md vac h2o-vel-1.xyz
+```
+默认的`[FILENAME]`为`*-vel-1.xyz`
+
 ## DFT 性质分析脚本
 `dft`为DFT性质分析工具, 其中包含多个分析工具
 ### PDOS
@@ -208,13 +215,17 @@ mdkits build supercell Li3PO4.cif 2 2 2
 ```bash
 mdkits extract frames.xyz -r 1000:2000 -o 1000-2000.xyz
 ```
-或从`cp2k`的默认输出的轨迹文件`*-pos-1.xyz`文件中提取最后一帧输出为`extracted.xyz`(`extract`的默认行为):
+或从`cp2k`的默认输出的轨迹文件`*-pos-1.xyz`文件中提取最后一帧输出为`frames_-1.xyz`(`extract`的默认行为):
 ```bash
 mdkits extract
 ```
 或每50帧输出一个结构到`./coord`目录中, 同时调整输出格式为`cp2k`的`@INCLUDE coord.xyz`的形式:
 ```bash
 mdkits extract -cr ::50
+```
+提取部分元素的位置, 如提取`O`元素和`H`元素的位置:
+```bash
+mdkits extract --select "name O or name H"
 ```
 
 ### 结构文件转换

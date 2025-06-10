@@ -12,6 +12,7 @@ from mdkits.util import os_operation
 @click.option('-t', '--type', type=str, default='total', show_default=True)
 @click.option('-c', '--clos', type=tuple)
 def main(filename, type, clos):
+    """analysis cp2k pdos file"""
     if type == 'total':
         dos_obj = Cp2kPdos(filename[0])
         dos, ener = dos_obj.get_raw_dos(dos_type=type)

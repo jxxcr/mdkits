@@ -34,17 +34,9 @@ class Velocity_AutoCorrelation(AnalysisBase):
 
         sf = self.cvv.shape[0]
         fftraj = np.fft.rfft(self.cvv)
-        fdos = np.mean(fftraj)
-        print(fdos.shape)
-        #fdos = np.mean(fftraj*np.conjugate(fftraj)) / sf
-        #print(np.conjugate(fftraj))
-        #print(fftraj.shape)
-        #print(fdos.shape)
+        fdos = np.abs(fftraj)
 
         faxis = np.fft.rfftfreq(sf, d=1/sf)
-        #pf = np.where(faxis>0)
-        #faxis = faxis[pf]
-        #fdos = fdos[pf]
 
         combine = np.column_stack((np.arange(len(self.cvv)), self.cvv))
 
@@ -57,7 +49,7 @@ class Velocity_AutoCorrelation(AnalysisBase):
 @click.option("--select", type=str, default="all", help="atom selection", show_default=True)
 @click.option('-r', type=arg_type.FrameRange, help='range of frame to analysis')
 def main(filename, select, r):
-    """analysis velocity autocorrelation function"""
+    """analysis velocity autocorrelation function and frequency"""
     a = Velocity_AutoCorrelation(filename, select)
 
     if r is not None:
