@@ -23,7 +23,6 @@ Cp2kData = "^0.7.2"
 numpy = "^1.26.4"
 julia = "^0.6.2"
 tidynamics = "^1.1.2"
-scipy = "^1.13.0"
 
 [tool.poetry.group.dev.dependencies]
 pylint = "^2.17.4"

@@ -89,7 +89,11 @@ class Dipole_distribution(AnalysisBase):
             bins_z = np.arange(len(average_dipole)) * self.bin_size
 
             if self.surface:
-                lower_z, upper_z = self.surface_pos / self.frame_count
+                lower_z = self.surface_pos[0] / self.frame_count
+                if self.surface_pos[1] == 0:
+                    upper_z = np.inf
+                else:
+                    upper_z = self.surface_pos[1] / self.frame_count
 
                 mask = (bins_z >= lower_z) & (bins_z <= upper_z)
                 filtered_bins_z = bins_z[mask] - lower_z

@@ -112,7 +112,7 @@ def find_surface(surface_group:np.ndarray, layer_tolerance=0.05, surface_toleran
         layer_mean.append(np.mean(current_layer))
     
     if len(layer_mean) == 1:
-        return [layer_mean[0]]
+        return [layer_mean[0], 0]
 
     diff = np.diff(layer_mean)
     if np.any(diff > surface_tolerance):
@@ -120,5 +120,5 @@ def find_surface(surface_group:np.ndarray, layer_tolerance=0.05, surface_toleran
         return (layer_mean[index], layer_mean[index + 1])
     else:
         if layer_mean[-1] > layer_mean[0]:
-            return [layer_mean[-1]]
+            return [layer_mean[-1], 0]
         return (layer_mean[-1], layer_mean[0])

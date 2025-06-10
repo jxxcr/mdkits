@@ -9,11 +9,12 @@ import MDAnalysis
 from MDAnalysis import Universe
 
 
-def write_to_xyz(u, frames, o, cut=None):
-    with MDAnalysis.Writer(o, u.atoms.n_atoms, format='XYZ') as w:
+def write_to_xyz(u, frames, o, select, cut=None):
+    ag = u.select_atoms(select)
+    with MDAnalysis.Writer(o, ag.atoms.n_atoms, format='XYZ') as w:
         for ts in u.trajectory:
             if ts.frame in frames:
-                w.write(u)
+                w.write(ag)
     if cut:
         with open(o, 'r') as fi, open(o+'t', 'w') as fo:
             for i, line in enumerate(fi):
@@ -22,13 +23,18 @@ def write_to_xyz(u, frames, o, cut=None):
         os.replace(o+'t', o)
 
 
-def write_to_xyz_s(u, frames, cut=None):
+def write_to_xyz_s(u, frames, select, cut=None):
     index = 0
+    ag = u.select_atoms(select)
+    if select:
+        dir = f'./coord/{"_".join(select.split())}'
+    else:
+        dir = './coord/all'
     for ts in u.trajectory:
         if ts.frame in frames:
-            o = f'./coord/coord_{index:03d}'
-            with MDAnalysis.Writer(o, u.atoms.n_atoms, format='XYZ') as w:
-                w.write(u)
+            o = f'{dir}/coord_{index:03d}'
+            with MDAnalysis.Writer(o, ag.atoms.n_atoms, format='XYZ') as w:
+                w.write(ag)
                 index += 1
             if cut:
                 with open(o, 'r') as fi, open(o+'t', 'w') as fo:
@@ -39,10 +45,10 @@ def write_to_xyz_s(u, frames, cut=None):
 
 @click.command(name='extract')
 @click.argument('input_file_name', type=click.Path(exists=True), default=os_operation.default_file_name('*-pos-1.xyz', last=True))
-@click.option('-o', type=str, help='output file name', default='extracted.xyz', show_default=True)
 @click.option('-r', type=arg_type.FrameRange, help='frame range to slice', default='-1', show_default=True)
 @click.option('-c', help='output a coord.xyz', is_flag=True)
-def main(input_file_name, o, r, c):
+@click.option("--select", type=str, help="select atoms to extract")
+def main(input_file_name, r, c, select):
     """
     extract frames in trajectory file
     """
@@ -63,16 +69,21 @@ def main(input_file_name, o, r, c):
         cut = None
 
     if len(r) == 3 and r[-1] is not None:
-        if not os.path.exists('./coord'):
-            os.makedirs('./coord')
+        if select:
+            dir = f'./coord/{"_".join(select.split())}'
+        else:
+            dir = './coord/all'
+        if not os.path.exists(dir):
+            os.makedirs(dir)
         else:
             import shutil
-            shutil.rmtree('./coord')
-            os.makedirs('./coord')
-        write_to_xyz_s(u, frames, cut=cut)
-        click.echo(os.path.abspath('./coord'))
+            shutil.rmtree(dir)
+            os.makedirs(dir)
+        write_to_xyz_s(u, frames, select, cut=cut)
+        click.echo(os.path.abspath(dir))
     else:
-        write_to_xyz(u, frames, o, cut=cut)
+        o = f"{os.path.basename(u.filename).split('.')[0]}_{'_'.join([str(i) for i in r])}_{'_'.join(select.split()) if select else 'all'}.xyz"
+        write_to_xyz(u, frames, o, select, cut=cut)
         click.echo(os.path.abspath(o))
 
 

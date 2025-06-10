@@ -5,7 +5,7 @@ import click
 import MDAnalysis
 from MDAnalysis import Universe
 from MDAnalysis.analysis.base import AnalysisBase
-from mdkits.util import arg_type, os_operation, numpy_geo, encapsulated_mda
+from mdkits.util import numpy_geo, encapsulated_mda
 import warnings, sys
 from .setting import common_setting
 warnings.filterwarnings("ignore")
@@ -123,8 +123,7 @@ class Hb_distribution(AnalysisBase):
         if self.surface_group:
             surface = numpy_geo.find_surface(self.surface_group.positions[:, 2])
             self.surface_pos[0] += surface[0]
-            if len(surface) > 1:
-                self.surface_pos[1] += surface[1]
+            self.surface_pos[1] += surface[1]
 
         self.frame_count += 1
 
@@ -138,10 +137,12 @@ class Hb_distribution(AnalysisBase):
             bins_z = np.arange(len(self.donor)) * self.bin_size
 
             if self.surface:
-                surface = self.surface_pos/self.frame_count
-                lower_z = surface[0]
-                if surface[1] ==0:
+                lower_z = self.surface_pos[0] / self.frame_count
+                if self.surface_pos[1] == 0:
                     upper_z = np.inf
+                else:
+                    upper_z = self.surface_pos[1] / self.frame_count
+
                 mask = (bins_z >= lower_z) & (bins_z <= upper_z)
                 filtered_bins_z = bins_z[mask] - lower_z
                 filtered_average_accepter = average_accepter[mask]

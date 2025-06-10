@@ -82,8 +82,7 @@ class Density_distribution(AnalysisBase):
         if self.surface_group:
             surface = numpy_geo.find_surface(self.surface_group.positions[:, 2])
             self.surface_pos[0] += surface[0]
-            if len(surface) > 1:
-                self.surface_pos[1] += surface[1]
+            self.surface_pos[1] += surface[1]
 
         self.frame_count += 1
 
@@ -102,6 +101,8 @@ class Density_distribution(AnalysisBase):
                 lower_z = self.surface_pos[0] / self.frame_count
                 if self.surface_pos[1] == 0:
                     upper_z = np.inf
+                else:
+                    upper_z = self.surface_pos[1] / self.frame_count
 
                 mask = (bins_z >= lower_z) & (bins_z <= upper_z)
                 filtered_bins_z = bins_z[mask] - lower_z
@@ -118,14 +119,20 @@ class Density_distribution(AnalysisBase):
 @click.option('--group', type=str, help='group to analysis')
 @click.option('--atomic_mass', type=float, help='output density unit (g/cm3), should give atomic mass of element, else is concentration unit (mol/L)')
 @click.option('-o', type=str, help='output file name', default='density_{element}.dat', show_default=True)
-def main(filename, cell, o, element, atomic_mass, update_water, distance, angle, surface):
+def main(filename, cell, o, group, atomic_mass, update_water, distance, angle, surface, r):
     """
     analysis density or concentration of element in a trajectory file
     """
 
-    density_dist = Density_distribution(filename, cell, o=o, distance_judg=distance, angle_judg=angle, element=element, atomic_mass=atomic_mass, update_water=update_water, surface=surface)
+    density_dist = Density_distribution(filename, cell, o=o, distance_judg=distance, angle_judg=angle, element=group, atomic_mass=atomic_mass, update_water=update_water, surface=surface)
 
-    density_dist.run()
+    if r is not None:
+        if len(r) == 2:
+            density_dist.run(start=r[0], stop=r[1])
+        elif len(r) == 3:
+            density_dist.run(start=r[0], stop=r[1], step=r[2])
+    else:
+        density_dist.run()
 
 
 if __name__ == '__main__':

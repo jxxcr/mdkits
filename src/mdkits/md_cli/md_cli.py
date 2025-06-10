@@ -5,6 +5,7 @@ from mdkits.md_cli import (
     angle,
     density,
     hb_distribution,
+    vac,
     rdf,
     msd,
     monitor,
@@ -21,6 +22,7 @@ cli.add_command(density.main)
 cli.add_command(dipole.main)
 cli.add_command(angle.main)
 cli.add_command(hb_distribution.main)
+cli.add_command(vac.main)
 cli.add_command(rdf.main)
 cli.add_command(msd.main)
 cli.add_command(monitor.main)

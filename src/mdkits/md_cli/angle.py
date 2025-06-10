@@ -63,7 +63,7 @@ class Angle_distribution(AnalysisBase):
     def _single_frame(self):
         surface = numpy_geo.find_surface(self.surface_group.positions[:, 2])
 
-        if len(surface) == 1:
+        if surface[1] == 0:
             o_group = self.atomgroup.select_atoms(f"name O and prop z < {surface[0]+self.water_height}", updating=True)
         else:
             o_group = self.atomgroup.select_atoms(f"name O and (prop z < {surface[0]+self.water_height} or prop z > {surface[1]-self.water_height})", updating=True)
