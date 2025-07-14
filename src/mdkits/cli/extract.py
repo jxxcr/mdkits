@@ -47,7 +47,7 @@ def write_to_xyz_s(u, frames, select, cut=None):
 @click.argument('input_file_name', type=click.Path(exists=True), default=os_operation.default_file_name('*-pos-1.xyz', last=True))
 @click.option('-r', type=arg_type.FrameRange, help='frame range to slice', default='-1', show_default=True)
 @click.option('-c', help='output a coord.xyz', is_flag=True)
-@click.option("--select", type=str, help="select atoms to extract")
+@click.option("--select", type=str, help="select atoms to extract", default="all", show_default=True)
 def main(input_file_name, r, c, select):
     """
     extract frames in trajectory file

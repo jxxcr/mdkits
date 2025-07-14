@@ -1,0 +1,85 @@
+Date : 2025-06-10 10:02:40
+Directory : d:\script\mdkits
+Total : 46 files,  4208 codes, 225 comments, 784 blanks, all 5217 lines
+
+Languages
++----------+------------+------------+------------+------------+------------+
+| language | files      | code       | comment    | blank      | total      |
++----------+------------+------------+------------+------------+------------+
+| Python   |         40 |      2,009 |        225 |        590 |      2,824 |
+| toml     |          1 |      1,818 |          0 |        133 |      1,951 |
+| Markdown |          2 |        325 |          0 |         55 |        380 |
+| YAML     |          2 |         33 |          0 |          2 |         35 |
+| Ini      |          1 |         23 |          0 |          4 |         27 |
++----------+------------+------------+------------+------------+------------+
+
+Directories
++----------------------------------------------------------+------------+------------+------------+------------+------------+
+| path                                                     | files      | code       | comment    | blank      | total      |
++----------------------------------------------------------+------------+------------+------------+------------+------------+
+| .                                                        |         46 |      4,208 |        225 |        784 |      5,217 |
+| . (Files)                                                |          4 |      2,150 |          0 |        164 |      2,314 |
+| docs                                                     |          1 |         45 |          0 |         29 |         74 |
+| src                                                      |         41 |      2,013 |        225 |        591 |      2,829 |
+| src\mdkits                                               |         41 |      2,013 |        225 |        591 |      2,829 |
+| src\mdkits (Files)                                       |          2 |         24 |          1 |          7 |         32 |
+| src\mdkits\build_cli                                     |          9 |        378 |         29 |        108 |        515 |
+| src\mdkits\cli                                           |          4 |        384 |         49 |         99 |        532 |
+| src\mdkits\config                                        |          2 |         24 |          8 |          9 |         41 |
+| src\mdkits\dft_cli                                       |          3 |         64 |          9 |         23 |         96 |
+| src\mdkits\md_cli                                        |         11 |        685 |         19 |        202 |        906 |
+| src\mdkits\util                                          |         10 |        454 |        110 |        143 |        707 |
++----------------------------------------------------------+------------+------------+------------+------------+------------+
+
+Files
++----------------------------------------------------------+----------+------------+------------+------------+------------+
+| filename                                                 | language | code       | comment    | blank      | total      |
++----------------------------------------------------------+----------+------------+------------+------------+------------+
+| d:\script\mdkits\.pre-commit-config.yaml                 | YAML     |         29 |          0 |          1 |         30 |
+| d:\script\mdkits\README.md                               | Markdown |        280 |          0 |         26 |        306 |
+| d:\script\mdkits\docs\development.md                     | Markdown |         45 |          0 |         29 |         74 |
+| d:\script\mdkits\poetry.lock                             | toml     |      1,818 |          0 |        133 |      1,951 |
+| d:\script\mdkits\src\mdkits\__init__.py                  | Python   |          0 |          0 |          1 |          1 |
+| d:\script\mdkits\src\mdkits\build_cli\__init__.py        | Python   |          0 |          0 |          1 |          1 |
+| d:\script\mdkits\src\mdkits\build_cli\adsorbate.py       | Python   |         38 |          2 |         14 |         54 |
+| d:\script\mdkits\src\mdkits\build_cli\build_bulk.py      | Python   |         21 |          8 |          9 |         38 |
+| d:\script\mdkits\src\mdkits\build_cli\build_cli.py       | Python   |         23 |          6 |          5 |         34 |
+| d:\script\mdkits\src\mdkits\build_cli\build_interface.py | Python   |         61 |          1 |         12 |         74 |
+| d:\script\mdkits\src\mdkits\build_cli\build_solution.py  | Python   |        105 |          3 |         26 |        134 |
+| d:\script\mdkits\src\mdkits\build_cli\build_surface.py   | Python   |         44 |          2 |         13 |         59 |
+| d:\script\mdkits\src\mdkits\build_cli\cut_surface.py     | Python   |         57 |          5 |         17 |         79 |
+| d:\script\mdkits\src\mdkits\build_cli\supercell.py       | Python   |         29 |          2 |         11 |         42 |
+| d:\script\mdkits\src\mdkits\cli\convert.py               | Python   |         45 |          4 |         16 |         65 |
+| d:\script\mdkits\src\mdkits\cli\data.py                  | Python   |         64 |          4 |         13 |         81 |
+| d:\script\mdkits\src\mdkits\cli\extract.py               | Python   |         74 |          5 |         13 |         92 |
+| d:\script\mdkits\src\mdkits\cli\plot.py                  | Python   |        201 |         36 |         57 |        294 |
+| d:\script\mdkits\src\mdkits\config\__init__.py           | Python   |         20 |          8 |          8 |         36 |
+| d:\script\mdkits\src\mdkits\config\settings.yml          | YAML     |          4 |          0 |          1 |          5 |
+| d:\script\mdkits\src\mdkits\dft_cli\cube.py              | Python   |         22 |          5 |         12 |         39 |
+| d:\script\mdkits\src\mdkits\dft_cli\dft_cli.py           | Python   |         13 |          1 |          5 |         19 |
+| d:\script\mdkits\src\mdkits\dft_cli\pdos.py              | Python   |         29 |          3 |          6 |         38 |
+| d:\script\mdkits\src\mdkits\md_cli\angle.py              | Python   |         93 |          1 |         28 |        122 |
+| d:\script\mdkits\src\mdkits\md_cli\density.py            | Python   |        105 |          4 |         31 |        140 |
+| d:\script\mdkits\src\mdkits\md_cli\dipole.py             | Python   |         96 |          1 |         27 |        124 |
+| d:\script\mdkits\src\mdkits\md_cli\hb_distribution.py    | Python   |        147 |          2 |         36 |        185 |
+| d:\script\mdkits\src\mdkits\md_cli\md_cli.py             | Python   |         26 |          1 |          5 |         32 |
+| d:\script\mdkits\src\mdkits\md_cli\monitor.py            | Python   |         77 |          3 |         24 |        104 |
+| d:\script\mdkits\src\mdkits\md_cli\msd.py                | Python   |         22 |          1 |          7 |         30 |
+| d:\script\mdkits\src\mdkits\md_cli\rdf.py                | Python   |         37 |          1 |         15 |         53 |
+| d:\script\mdkits\src\mdkits\md_cli\setting.py            | Python   |         11 |          0 |          3 |         14 |
+| d:\script\mdkits\src\mdkits\md_cli\vac.py                | Python   |         47 |          1 |         17 |         65 |
+| d:\script\mdkits\src\mdkits\md_cli\wrap.py               | Python   |         24 |          4 |          9 |         37 |
+| d:\script\mdkits\src\mdkits\mdkits.py                    | Python   |         24 |          1 |          6 |         31 |
+| d:\script\mdkits\src\mdkits\util\__init__.py             | Python   |          0 |          0 |          1 |          1 |
+| d:\script\mdkits\src\mdkits\util\arg_type.py             | Python   |         59 |          0 |         19 |         78 |
+| d:\script\mdkits\src\mdkits\util\cp2k_input_parsing.py   | Python   |         20 |         20 |          8 |         48 |
+| d:\script\mdkits\src\mdkits\util\encapsulated_ase.py     | Python   |         87 |         39 |         20 |        146 |
+| d:\script\mdkits\src\mdkits\util\encapsulated_mda.py     | Python   |         47 |          4 |         12 |         63 |
+| d:\script\mdkits\src\mdkits\util\fig_operation.py        | Python   |         24 |          0 |          5 |         29 |
+| d:\script\mdkits\src\mdkits\util\numpy_geo.py            | Python   |         90 |          8 |         27 |        125 |
+| d:\script\mdkits\src\mdkits\util\os_operation.py         | Python   |         28 |          0 |         12 |         40 |
+| d:\script\mdkits\src\mdkits\util\out_err.py              | Python   |         20 |          3 |          6 |         29 |
+| d:\script\mdkits\src\mdkits\util\structure_parsing.py    | Python   |         79 |         36 |         33 |        148 |
+| d:\script\mdkits\tox.ini                                 | Ini      |         23 |          0 |          4 |         27 |
+| Total                                                    |          |      4,208 |        225 |        784 |      5,217 |
++----------------------------------------------------------+----------+------------+------------+------------+------------+
