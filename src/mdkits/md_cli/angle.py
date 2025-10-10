@@ -98,7 +98,7 @@ class Angle_distribution(AnalysisBase):
         if self.frame_count > 0:
             average_angle_w = self.angle_w_distribution / self.frame_count
             average_angle_oh = self.angle_oh_distribution / (self.frame_count*2)
-            bins_z = np.arange(len(average_angle_w)) * self.bin_size
+            bins_z = np.arange(len(average_angle_w)) * self.bin_size + self.bin_size / 2
             conbined_data = np.column_stack((bins_z, average_angle_w, average_angle_oh))
             np.savetxt("angle_distribution.dat", conbined_data, header="angle\tw_suf_dist\toh_suf_dist", fmt='%.5f', delimiter='\t')
 

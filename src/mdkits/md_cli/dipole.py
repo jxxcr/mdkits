@@ -86,7 +86,7 @@ class Dipole_distribution(AnalysisBase):
             average_dipole = self.dipole_distribution / self.o_count
             water_density = (self.o_count * (15.999+1.0008*2) * 1.660539 / (self.u.dimensions[0] * self.u.dimensions[1] * self.bin_size)) / self.frame_count
             average_dipole = average_dipole * water_density
-            bins_z = np.arange(len(average_dipole)) * self.bin_size
+            bins_z = np.arange(len(average_dipole)) * self.bin_size + self.bin_size / 2
 
             if self.surface:
                 lower_z = self.surface_pos[0] / self.frame_count

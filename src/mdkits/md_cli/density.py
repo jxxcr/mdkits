@@ -95,7 +95,7 @@ class Density_distribution(AnalysisBase):
             else:
                 density_distribution = (self.density_distribution * (10000/6.02) / V) / self.frame_count
 
-            bins_z = np.arange(len(self.density_distribution)) * self.bin_size
+            bins_z = np.arange(len(self.density_distribution)) * self.bin_size + self.bin_size / 2
 
             if self.surface:
                 lower_z = self.surface_pos[0] / self.frame_count

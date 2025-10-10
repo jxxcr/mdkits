@@ -18,11 +18,16 @@ def main(filename, type, group):
     s = "_"
     name = f"{s.join(group.split(' '))}"
     header = ''
+    msd_cols = []
     for i in range(MSD.n_particles):
-        data = np.concatenate((data, MSD.results.msds_by_particle[:, i].reshape(-1, 1)), axis=1)
+        msd_cols.append(MSD.results.msds_by_particle[:, i].reshape(-1, 1))
         header += name + f"_{i}\t"
+    msd_array = np.concatenate(msd_cols, axis=1)
+    mean_col = np.mean(msd_array, axis=1, keepdims=True)
+    data = np.concatenate((data, mean_col, msd_array), axis=1)
+    header = "frame\tmean\t" + header
 
-    np.savetxt(f"msd_{type}.dat", data, fmt="%.5f", delimiter="\t", header=f"frame\t{header}")
+    np.savetxt(f"msd_{type}.dat", data, fmt="%.5f", delimiter="\t", header=header)
 
 
 

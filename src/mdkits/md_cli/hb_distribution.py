@@ -134,7 +134,7 @@ class Hb_distribution(AnalysisBase):
             average_accepter = np.nan_to_num((self.accepter / self.frame_count) / average_od, nan=0)
             average_sum = average_donor + average_accepter
 
-            bins_z = np.arange(len(self.donor)) * self.bin_size
+            bins_z = np.arange(len(self.donor)) * self.bin_size + self.bin_size / 2
 
             if self.surface:
                 lower_z = self.surface_pos[0] / self.frame_count
