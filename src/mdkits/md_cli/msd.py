@@ -27,7 +27,8 @@ def main(filename, type, group):
     data = np.concatenate((data, mean_col, msd_array), axis=1)
     header = "frame\tmean\t" + header
 
-    np.savetxt(f"msd_{type}.dat", data, fmt="%.5f", delimiter="\t", header=header)
+    o = f"msd_{type}_{'_'.join(group).replace(' ', '_')}.dat"
+    np.savetxt(o, data, fmt="%.5f", delimiter="\t", header=header)
 
 
 
