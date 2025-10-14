@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 import numpy as np
-import click
+import click, math
 from MDAnalysis import Universe
 from MDAnalysis.analysis.base import AnalysisBase
 from mdkits.util import (
@@ -88,7 +88,7 @@ class Density_distribution(AnalysisBase):
 
     def _conclude(self):
         if self.frame_count > 0:
-            V = self.u.dimensions[0] * self.u.dimensions[1] * self.bin_size
+            V = self.u.dimensions[0] * self.u.dimensions[1] * math.sin(math.radians(180 - self.u.dimensions[-1])) * self.bin_size
 
             if self.atomic_mass:
                 density_distribution = (self.density_distribution * self.atomic_mass * 1.660539 / V) / self.frame_count

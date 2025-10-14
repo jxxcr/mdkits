@@ -17,6 +17,7 @@ def main(filename, type, group):
     data = np.arange(1, MSD.n_frames + 1).reshape(-1, 1)
     s = "_"
     name = f"{s.join(group.split(' '))}"
+    o = f"msd_{type}_{name}.dat"
     header = ''
     msd_cols = []
     for i in range(MSD.n_particles):
@@ -27,7 +28,6 @@ def main(filename, type, group):
     data = np.concatenate((data, mean_col, msd_array), axis=1)
     header = "frame\tmean\t" + header
 
-    o = f"msd_{type}_{'_'.join(group).replace(' ', '_')}.dat"
     np.savetxt(o, data, fmt="%.5f", delimiter="\t", header=header)
 
 
