@@ -3,6 +3,7 @@
 import click, os
 from ase.build import bulk
 import numpy as np
+from mdkits.util import out_err
 
 
 @click.command(name='bulk')
@@ -29,7 +30,7 @@ def main(symbol, cs, a, b, c, alpha, covera, u, orth, cubic):
 
     o = f"{symbol}_{cs}.cif"
     atoms.write(o, format='cif')
-    print(os.path.abspath(o))
+    out_err.path_output(o)
 
 
 if __name__ == '__main__':

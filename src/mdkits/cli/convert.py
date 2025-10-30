@@ -57,7 +57,7 @@ def main(atoms, c, x, d, v, coord, cp2k, center, cell):
             f.write(f"ALPHA_BETA_GAMMA {cell[3]} {cell[4]} {cell[5]}\n")
 
 
-    print(os.path.abspath(o))
+    out_err.path_output(o)
 
 
 if __name__ == '__main__':

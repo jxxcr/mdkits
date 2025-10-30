@@ -4,7 +4,7 @@
 
 import os
 import click
-from mdkits.util import os_operation, arg_type
+from mdkits.util import os_operation, arg_type, out_err
 import MDAnalysis
 from MDAnalysis import Universe
 
@@ -84,7 +84,7 @@ def main(input_file_name, r, c, select):
     else:
         o = f"{os.path.basename(u.filename).split('.')[0]}_{'_'.join([str(i) for i in r])}_{'_'.join(select.split()) if select else 'all'}.xyz"
         write_to_xyz(u, frames, o, select, cut=cut)
-        click.echo(os.path.abspath(o))
+        out_err.path_output(o)
 
 
 if __name__ == '__main__':

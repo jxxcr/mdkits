@@ -45,7 +45,7 @@ def main(atoms, adsorbate, cell, select, height, rotate, offset, cover):
 
     atoms.write(output_filename, format='cif')
 
-    print(os.path.abspath(output_filename))
+    out_err.path_output(output_filename)
 
 
 if __name__ == '__main__':

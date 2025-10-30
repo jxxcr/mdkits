@@ -23,6 +23,9 @@ def main(slab, sol, interval, cap, vacuum):
         slab_copy = slab.copy()
 
     sol_cell = sol.cell.cellpar()
+
+    interface_cell = [max(slab_cell[0], sol_cell[0]), max(slab_cell[1], sol_cell[1]), max(slab_cell[2], sol_cell[2]), max(slab_cell[3], sol_cell[3]), max(slab_cell[4], sol_cell[4]), max(slab_cell[5], sol_cell[5])]
+
     sol.set_pbc(True)
     sol.center()
     sol.positions[:, 2] += slab_cell[2] + interval
@@ -62,6 +65,8 @@ def main(slab, sol, interval, cap, vacuum):
         slab.set_cell(slab_cell)
         slab.center()
     
+    slab_cell[0] = interface_cell[0]
+    slab_cell[1] = interface_cell[1]
     if vacuum > 0:
         slab_cell[2] += vacuum
         slab.set_cell(slab_cell)

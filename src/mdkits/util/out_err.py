@@ -14,7 +14,12 @@ def cell_output(atoms):
 
 
 def path_output(file: str):
-    print(os.path.abspath(file))
+    env_var_name = 'ssh_name'
+    file_path = os.path.abspath(file)
+    if os.environ.get(env_var_name):
+        ssh_name = os.environ.get(env_var_name)
+        file_path = f"{ssh_name}:{file_path}"
+    print(file_path)
 
 def check_cell(atoms, cell=None):
     if cell is not None:

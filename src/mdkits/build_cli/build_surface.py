@@ -50,7 +50,7 @@ def main(symbol, surface, size, kind, a, c, thickness, orth, vacuum):
     
     out_err.check_cell(atoms)
     atoms.write(out_filename)
-    print(os.path.abspath(out_filename))
+    out_err.path_output(out_filename)
 
 
 if __name__ == '__main__':

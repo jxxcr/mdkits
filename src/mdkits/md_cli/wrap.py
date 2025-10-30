@@ -6,7 +6,8 @@ import MDAnalysis, click
 from mdkits.util import (
     arg_type,
     os_operation,
-    cp2k_input_parsing
+    cp2k_input_parsing,
+    out_err
     )
 
 
@@ -29,7 +30,7 @@ def main(filename, o, cell):
             W.write(ag)
 
     click.echo(f"\nwrap is done, output file {o} is:")
-    click.echo(os.path.abspath(o))
+    out_err.path_output(o)
 
 
 if __name__ == '__main__':

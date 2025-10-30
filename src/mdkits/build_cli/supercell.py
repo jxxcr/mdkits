@@ -34,7 +34,7 @@ def main(atoms, super, cell):
 
     o = f"{atoms.filename.split('.')[-2]}_{super[0]}{super[1]}{super[2]}.cif"
     super_atom.write(o)
-    print(os.path.abspath(o))
+    out_err.path_output(o)
 
 
 if __name__ == '__main__':
