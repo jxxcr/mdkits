@@ -8,6 +8,10 @@ pip install mdkits --upgrade
 2. `FRAME RANGE`: 指定帧范围, 如`1`, `1:10:2`等
 3. `--group`和`--surface`: 按[选择语言](https://userguide.mdanalysis.org/stable/selections.html)选取分析对象
 4. `--update_water`, `--distance` 和 `--angle`: 在分析轨迹的过程中开启动态更新水分子的功能
+5. 在服务器中将其对应的`SSH config-file`中的`Host`指定为`ssh_name`环境变量就可以在脚本输出`path`的前面带上`ssh_name`, 方便后续的`scp`操作:
+```bash
+ssh_name:path/to/file
+```
 
 ## 轨迹文件处理脚本
 `md`为轨迹文件处理工具, 其中包含多个处理工具

@@ -12,6 +12,10 @@ pip install mdkits --upgrade
 2.  `FRAME RANGE`: Specifies the frame range, e.g., `1`, `1:10:2`, etc.
 3.  `--group` and `--surface`: Select analysis objects using [selection language](https://userguide.mdanalysis.org/stable/selections.html).
 4.  `--update_water`, `--distance`, and `--angle`: Enable dynamic update of water molecule positions during trajectory analysis.
+5.  By specifying the `Host` in the corresponding `SSH config-file` on the server as the `ssh_name` environment variable, you can prepend `ssh_name` to the `path` in the script's output, which facilitates subsequent `scp` operations:
+    ```bash
+    ssh_name:path/to/file
+    ```
 
 ## Trajectory File Processing Scripts
 
