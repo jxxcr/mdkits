@@ -66,24 +66,45 @@ def rdf(chunk, cell, bin_size, name, parallel=True):
     ana.clear_cache()
 
 
-def ave_cube(filepath):
+def ave_cube(filepath, axis):
     """
     function: average hartree file in z_coordinate
     parameter:
         filepath: hartree cube file path
+        axis: average axis, can be 'x','y','z' or 0,1,2
     return:
         z_cube_data: a list of cube data alone z axes
         z_coordinates: a list of coordinates of z axes
     """
+    if isinstance(axis, str):
+        mapping = {'x': 0, 'y': 1, 'z': 2}
+        key = axis.lower()
+        if key not in mapping:
+            raise ValueError(f"axis string must be one of 'x','y','z', got {axis}")
+        axis_idx = mapping[key]
+    else:
+        axis_idx = int(axis)
+    
     # read data from filepath
     data, atoms = read_cube_data(filepath)
-    # define need parameter
-    npoints = data.shape[2]
-    step_size = atoms.cell[2, 2] / ( npoints - 1 )
-    # average hartree file, and calculate z_coordinates
+
+    ndim = data.ndim
+    if axis_idx < 0:
+        axis_idx = ndim + axis_idx
+    if not (0 <= axis_idx < ndim):
+        raise ValueError(f"axis must be between 0 and {ndim-1}, got {axis_idx}")
+
+    npoints = data.shape[axis_idx]
+    step_size = atoms.cell.cellpar(axis_idx) / ( npoints - 1 )
+
     z_coordinates = [i * step_size for i in range(npoints)]
-    z_cube_data = data[:, :, :].sum(axis=(0, 1)) / ( data.shape[0] * data.shape[1] )
-    return np.column_stack((z_coordinates, z_cube_data))
+
+    other_axes = tuple(i for i in range(ndim) if i != axis_idx)
+    if other_axes:
+        averaged = data.mean(axis=other_axes)
+    else:
+        averaged = data.copy()
+    return np.column_stack((z_coordinates, averaged))
 
 
 def atoms_read_with_cell(file_name, cell=None, coord_mode=False, default_cell=np.array([0., 0., 0., 90., 90., 90.])):

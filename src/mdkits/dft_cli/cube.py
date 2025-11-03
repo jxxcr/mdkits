@@ -14,14 +14,15 @@ def ave_cube_data(cube_data, range):
 
 @click.command(name='cube')
 @click.argument('filename', type=click.Path(exists=True), default=os_operation.default_file_name('*.cube', last=True))
+@click.argument('axis', type=click.Choice(['x','y','z', '0','1','2']), default='z')
 @click.option('-b', '--bulk_range', type=(float, float), help='parameter to calculate mean value of bulk', default=None)
 @click.option('-o', type=str, help='output file name, default is "cube.out"', default='cube.out', show_default=True)
-def main(filename, bulk_range, o):
+def main(filename, axis, bulk_range, o):
 	"""
 	analysis cube file
 	"""
 
-	cube_data = encapsulated_ase.ave_cube(filename)
+	cube_data = encapsulated_ase.ave_cube(filename, axis)
 
 	## if bulk range is exit, out put a difference of cube_data
 	if bulk_range is not None:
