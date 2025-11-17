@@ -2,6 +2,7 @@ import click
 from mdkits.dft_cli import (
     cube,
     pdos,
+    fix,
 )
 
 
@@ -14,6 +15,7 @@ def main(ctx):
 
 main.add_command(cube.main)
 main.add_command(pdos.main)
+main.add_command(fix.main)
 
 if __name__ == '__main__':
     main()

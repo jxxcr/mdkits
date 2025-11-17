@@ -95,7 +95,7 @@ def ave_cube(filepath, axis):
         raise ValueError(f"axis must be between 0 and {ndim-1}, got {axis_idx}")
 
     npoints = data.shape[axis_idx]
-    step_size = atoms.cell.cellpar(axis_idx) / ( npoints - 1 )
+    step_size = atoms.cell.cellpar()[axis_idx] / ( npoints - 1 )
 
     z_coordinates = [i * step_size for i in range(npoints)]
 
