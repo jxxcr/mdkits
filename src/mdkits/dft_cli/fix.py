@@ -47,6 +47,7 @@ def main(filename, group, o):
             ranges.append(f"{start}..{prev}")
         list_str ="LIST " + " ".join(ranges)
 
+    print(f"{len(indices)} atoms have been fixed.")
     print(list_str)
     with open(o, 'w') as f:
         f.write(list_str + '\n')
