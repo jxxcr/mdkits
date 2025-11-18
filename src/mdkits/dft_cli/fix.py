@@ -11,9 +11,20 @@ def main(filename, group, o):
     """
     generate fix.inc file for cp2k
     """
-    atoms = Universe(filename).select_atoms(group)
+    
+    with open(filename, 'r', encoding='utf-8') as fh:
+        lines = fh.read().splitlines()
+    first = lines[0].strip() if lines else ''
+    if not first.isdigit():
+        atoms_number = sum(1 for l in lines if l.strip())
+        s = '\n'.join([str(atoms_number), ''] + lines) + '\n'
+        import io
+        virtual_file = io.StringIO(s)
+        atoms = Universe(virtual_file, format='xyz').select_atoms(group)
+    else:
+        atoms = Universe(filename).select_atoms(group)
     indices = atoms.indices + 1
-    # 将 indices 转换为字符串：连续区间用 "start..end"，不连续索引用空格分隔
+    
     arr = sorted(set(int(i) for i in indices))
     if not arr:
         list_str = ""
@@ -29,7 +40,7 @@ def main(filename, group, o):
                 else:
                     ranges.append(f"{start}..{prev}")
                 start = prev = x
-        # 处理最后一段
+        
         if start == prev:
             ranges.append(str(start))
         else:
