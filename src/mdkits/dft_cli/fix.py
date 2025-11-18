@@ -24,6 +24,8 @@ def main(filename, group, o):
     else:
         atoms = Universe(filename).select_atoms(group)
     indices = atoms.indices + 1
+    fix_number = len(indices)
+    fix_output = f"{fix_number} atoms have been fixed."
     
     arr = sorted(set(int(i) for i in indices))
     if not arr:
@@ -45,9 +47,8 @@ def main(filename, group, o):
             ranges.append(str(start))
         else:
             ranges.append(f"{start}..{prev}")
-        list_str ="LIST " + " ".join(ranges)
+        list_str = "#" + fix_output + "\n" + "LIST " + " ".join(ranges)
 
-    print(f"{len(indices)} atoms have been fixed.")
     print(list_str)
     with open(o, 'w') as f:
         f.write(list_str + '\n')
