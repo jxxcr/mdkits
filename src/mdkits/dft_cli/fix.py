@@ -47,7 +47,7 @@ def main(filename, group, o):
             ranges.append(str(start))
         else:
             ranges.append(f"{start}..{prev}")
-        list_str = "#" + fix_output + "\n" + "LIST " + " ".join(ranges)
+        list_str = "# " + fix_output + "\n" + "LIST " + " ".join(ranges)
 
     print(list_str)
     with open(o, 'w') as f:
