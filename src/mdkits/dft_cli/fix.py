@@ -4,7 +4,7 @@ from mdkits.util import encapsulated_ase, os_operation
 
 
 @click.command(name='fix')
-@click.argument('filename', type=click.Path(exists=True))
+@click.argument('filename', type=click.Path(exists=True), default='./coord.xyz')
 @click.argument('group', type=str)
 @click.option('-o', type=str, help='output file name, default is "fix.inc"', default='fix.inc', show_default=True)
 def main(filename, group, o):
