@@ -13,7 +13,7 @@ def remove_temp_dir(temp_dir):
     shutil.rmtree(temp_dir)
 
 
-def default_file_name(match, last=False):
+def default_file_name(match, last=False, space_split=False):
     import glob
     file_list = glob.glob(match)
     if file_list:
@@ -21,6 +21,8 @@ def default_file_name(match, last=False):
             default_file_name = sort_word_and_number(file_list)[-1]
         else:
             default_file_name = list(file_list)
+            if space_split:
+                default_file_name = ' '.join(default_file_name)
     else:
         default_file_name = None
 

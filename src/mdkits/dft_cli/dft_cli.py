@@ -3,6 +3,7 @@ from mdkits.dft_cli import (
     cube,
     pdos,
     fix,
+    pdos2,
 )
 
 
@@ -16,6 +17,7 @@ def main(ctx):
 main.add_command(cube.main)
 main.add_command(pdos.main)
 main.add_command(fix.main)
+main.add_command(pdos2.main)
 
 if __name__ == '__main__':
     main()

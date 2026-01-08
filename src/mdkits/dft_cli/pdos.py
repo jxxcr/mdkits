@@ -1,38 +1,83 @@
-#!/usr/bin/env python3
-
-from cp2kdata import Cp2kPdos
+from pymatgen.io.cp2k import outputs
 import click
+from mdkits.util import arg_type
+from pymatgen.electronic_structure.core import Spin
+import pandas as pd
 import numpy as np
-from mdkits.util import os_operation
 
 
-# set argument
 @click.command(name='pdos')
-@click.argument('filename', type=list, default=os_operation.default_file_name('*-k*.pdos'))
-@click.option('-t', '--type', type=str, default='total', show_default=True)
-@click.option('-c', '--clos', type=tuple)
-def main(filename, type, clos):
-    """analysis cp2k pdos file"""
-    if type == 'total':
-        dos_obj = Cp2kPdos(filename[0])
-        dos, ener = dos_obj.get_raw_dos(dos_type=type)
-        print(f"analysis of total dos is done")
-        np.savetxt('total.pdos', np.column_stack((ener, dos)), header='energy\tdos')
-    else:
-        if type:
-            for file in filename:
-                dos_obj = Cp2kPdos(file)
-                dos, ener = dos_obj.get_raw_dos(dos_type=type)
-                print(f"analysis of {file}'s {type} dos is done")
-                np.savetxt(f'{dos_obj.read_dos_element()}_{type}.pdos', np.column_stack((ener, dos)), header='energy\tdos')
+@click.argument('filename', type=arg_type.FileList, default='*-k*.*')
+@click.option('--no-reference', is_flag=True, help='if specified, reference energy will not be shifted to fermi level')
+@click.option('-o', type=str, help='output file name')
+def main(filename, no_reference, o):
+    total_dict = {}
+    for file in filename:
+        dos = outputs.parse_pdos(file, total=True)
+        
+        pdos = dos[0]
+        tdos = dos[1]
+        element = list(pdos.keys())[0]
+        data_dict = {}
+        steplen = 0.1
+        fermi = pdos[element][list(pdos[element].keys())[0]].efermi
 
-        if clos:
-            for file in filename:
-                dos_obj = Cp2kPdos(file)
-                dos, ener = dos_obj.get_raw_dos(usecols=clos)
-                print(f"analysis of {file}'s {type} dos is done")
-                np.savetxt(f'{dos_obj.read_dos_element()}_{"_".join(clos)}.pdos', np.column_stack((ener, dos)), header='energy\tdos')
+        energies = pdos[element][list(pdos[element].keys())[0]].energies
+        n_min = np.floor((energies.min() - fermi) / steplen)
+        n_max = np.ceil((energies.max() - fermi) / steplen)
+        integers = np.arange(n_min, n_max + 1)
+        bins = fermi + integers * steplen
+
+        dos, ener = np.histogram(energies, bins=bins, weights=tdos.get_densities(Spin.up), range=(energies[0], energies[-1]))
+        data_dict['energy'] = ener[:-1] + steplen/2
 
 
-if __name__ == '__main__':
-    main()
+        df = pd.DataFrame(data_dict)
+
+        df['total'] = 0
+        for orb_key in pdos[element].keys():
+            data_obj = pdos[element][orb_key]
+            weights = data_obj.get_densities(Spin.up)
+            dos, ener = np.histogram(energies, bins=bins, weights=weights, range=(energies[0], energies[-1]))
+            df[orb_key] = dos/steplen
+            df['total'] += dos/steplen
+
+
+        if Spin.down in pdos[element][list(pdos[element].keys())[0]].densities:
+            df['total_down'] = 0
+            for orb_key in pdos[element].keys():
+                data_obj = pdos[element][orb_key]
+                weights = data_obj.get_densities(Spin.down)
+                dos, ener = np.histogram(energies, bins=bins, weights=weights, range=(energies[0], energies[-1]))
+                df[f'{orb_key}_down'] = dos/steplen
+                df['total_down'] += dos/steplen
+
+        if o is None:
+            out_filename = f"{element}.pdos"
+        else:
+            out_filename = o
+
+        total_dict[element] = df
+
+        if not no_reference:
+            df['energy'] = df['energy'] - fermi
+
+        with open(out_filename, 'w') as f:
+            header = '#' + ' '.join([str(key) for key in df.columns]) + '\n'
+            f.write(header)
+            df.to_csv(f, sep='\t', index=False, header=False)
+
+
+    energy = list(total_dict.values())[0]['energy']
+
+    total_dos = 0
+    for element, df in total_dict.items():
+        total_dos += df['total']
+
+    total_df = pd.DataFrame({'energy': energy, 'total': total_dos})
+
+    
+    with open('total.pdos', 'w') as f:
+        header = '# energy total_dos' + '\n'
+        f.write(header)
+        total_df.to_csv(f, sep='\t', index=False, header=False)

@@ -56,12 +56,12 @@ class StructureType(click.ParamType):
                 self.fail(f"{value} is not exists", param, ctx)
 
 
-
 class MoleculeType(click.Choice):
     name = "mocular type"
     def __init__(self):
         g2.names.append(click.Path(exists=True))
         super().__init__(choices=tuple(g2.names))
+
 
 class AdsSiteType(click.Choice):
     name = "adsorption site"
@@ -70,9 +70,22 @@ class AdsSiteType(click.Choice):
         super().__init__(choices=tuple(site))
 
 
+class FileListType(click.ParamType):
+    name = "file list"
+    def convert(self, value, param, ctx):
+        if isinstance(value, str):
+            import glob
+            file_list = glob.glob(value)
+            if file_list:
+                return file_list
+            else:
+                self.fail(f"No files match {value}", param, ctx)
+
+
 
 Cell = CellType()
 FrameRange = FrameRangeType()
 Molecule = MoleculeType()
 AdsSite = AdsSiteType()
 Structure = StructureType()
+FileList = FileListType()
