@@ -6,6 +6,28 @@ import pandas as pd
 import numpy as np
 
 
+def calculate_gaussian_dos(E_grid, eigenvalues, weights, sigma):
+    """
+    使用高斯函数对离散能级进行展宽计算 DOS。
+    利用 NumPy 广播机制进行高效计算。
+    """
+    # E_grid shape: (N_grid,) -> 变为列向量 (N_grid, 1)
+    # eigenvalues shape: (N_eigen,) -> 变为行向量 (1, N_eigen)
+    # delta_E shape: (N_grid, N_eigen)，包含了每个网格点到每个本征值的距离
+    delta_E = E_grid[:, np.newaxis] - eigenvalues[np.newaxis, :]
+    
+    # 计算高斯项
+    prefactor = 1.0 / (sigma * np.sqrt(2 * np.pi))
+    gaussians = prefactor * np.exp(-0.5 * (delta_E / sigma)**2)
+    
+    # 对所有本征值求和，并乘上权重
+    # axis=1 表示沿着本征值的方向求和，最终得到 (N_grid,) 的数组
+    dos_values = np.sum(gaussians * weights[np.newaxis, :], axis=1)
+    
+    return dos_values
+
+
+
 @click.command(name='pdos')
 @click.argument('filename', type=arg_type.FileList, default='*-k*.*')
 @click.option('--no-reference', is_flag=True, help='if specified, reference energy will not be shifted to fermi level')
@@ -19,16 +41,28 @@ def main(filename, no_reference, o):
         tdos = dos[1]
         element = list(pdos.keys())[0]
         data_dict = {}
-        steplen = 0.1
+        steplen = 0.2
         fermi = pdos[element][list(pdos[element].keys())[0]].efermi
+        gap =  pdos[element][list(pdos[element].keys())[0]].get_gap()
+        sigma = 0.02
 
         energies = pdos[element][list(pdos[element].keys())[0]].energies
         n_min = np.floor((energies.min() - fermi) / steplen)
         n_max = np.ceil((energies.max() - fermi) / steplen)
         integers = np.arange(n_min, n_max + 1)
         bins = fermi + integers * steplen
+        #e_min = energies.min() - 3 * sigma
+        #e_max = energies.max() + 3 * sigma
+        #n_step_left = np.ceil((fermi - e_min) / steplen).astype(int)
+        #n_step_right = np.ceil((e_max - fermi) / steplen).astype(int)
+        #indices = np.arange(-n_step_left, n_step_right + 1)
+        #bins = fermi + indices * steplen
+        #bins = int((energies[-1]-energies[0])/steplen)
+
 
         dos, ener = np.histogram(energies, bins=bins, weights=tdos.get_densities(Spin.up), range=(energies[0], energies[-1]))
+        #dos = calculate_gaussian_dos(bins + steplen/2, energies, tdos.get_densities(Spin.up), sigma)
+        #data_dict['energy'] = bins + steplen/2
         data_dict['energy'] = ener[:-1] + steplen/2
 
 
@@ -39,6 +73,7 @@ def main(filename, no_reference, o):
             data_obj = pdos[element][orb_key]
             weights = data_obj.get_densities(Spin.up)
             dos, ener = np.histogram(energies, bins=bins, weights=weights, range=(energies[0], energies[-1]))
+            #dos = calculate_gaussian_dos(bins + steplen/2, energies, weights, sigma)
             df[orb_key] = dos/steplen
             df['total'] += dos/steplen
 
@@ -49,6 +84,7 @@ def main(filename, no_reference, o):
                 data_obj = pdos[element][orb_key]
                 weights = data_obj.get_densities(Spin.down)
                 dos, ener = np.histogram(energies, bins=bins, weights=weights, range=(energies[0], energies[-1]))
+                #dos = calculate_gaussian_dos(bins + steplen/2, energies, weights, sigma)
                 df[f'{orb_key}_down'] = dos/steplen
                 df['total_down'] += dos/steplen
 
@@ -78,6 +114,6 @@ def main(filename, no_reference, o):
 
     
     with open('total.pdos', 'w') as f:
-        header = '# energy total_dos' + '\n'
+        header = '# energy total_dos' + '\n' + f'# Fermi Level: {fermi}' + f'gap: {gap}' + '\n'
         f.write(header)
         total_df.to_csv(f, sep='\t', index=False, header=False)
