@@ -32,7 +32,7 @@ def write_to_xyz_s(u, frames, select, cut=None):
         dir = './coord/all'
     for ts in u.trajectory:
         if ts.frame in frames:
-            o = f'{dir}/coord_{index:03d}'
+            o = f'{dir}/coord_{index:03d}.xyz'
             with MDAnalysis.Writer(o, ag.atoms.n_atoms, format='XYZ') as w:
                 w.write(ag)
                 index += 1
