@@ -74,6 +74,7 @@ class FileListType(click.ParamType):
     name = "file list"
     def convert(self, value, param, ctx):
         if isinstance(value, str):
+            value = value.replace('`', '') # for window adaptation
             import glob
             file_list = glob.glob(value)
             if file_list:
