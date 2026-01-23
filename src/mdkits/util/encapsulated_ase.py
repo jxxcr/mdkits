@@ -165,3 +165,17 @@ def atoms_to_u(atoms):
     u.dimensions = cell
 
     return u
+
+def u_to_cif(u, filename):
+    import os
+    temp_file = './temp.xyz'
+    u.select_atoms("all").write(temp_file, format='xyz')
+
+
+    atoms = read(temp_file)
+
+    if os.path.exists(temp_file):
+        os.remove(temp_file)
+
+    atoms.set_cell(u.dimensions)
+    atoms.write(filename, format='cif')
