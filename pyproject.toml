@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "mdkits"
-version = "1.3.2"
+version = "1.3.3"
 description = "kits for md or dft"
 readme = "README.md"
 authors = ["jxxcr <jixxcr@qq.com>"]
