@@ -1,6 +1,7 @@
 import click
 from mdkits.build_cli import build_cli
 from mdkits.dft_cli import dft_cli
+from mdkits.dfpt_cli import dfpt_cli
 from mdkits.md_cli import md_cli
 from mdkits.cli import (
     convert,
@@ -21,6 +22,7 @@ def cli(ctx):
 cli.add_command(md_cli.cli)
 cli.add_command(build_cli.cli_build)
 cli.add_command(dft_cli.main)
+cli.add_command(dfpt_cli.main)
 cli.add_command(convert.main)
 cli.add_command(extract.main)
 cli.add_command(data.main)

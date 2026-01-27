@@ -166,6 +166,19 @@ def atoms_to_u(atoms):
 
     return u
 
+def atoms_to_pymatgen_structure(atoms):
+    import os
+    temp_file = './temp.cif'
+    atoms.write(temp_file, format='cif')
+
+    from pymatgen.io import cif
+    structure = cif.CifParser(temp_file).get_structures(primitive=False)[0]
+
+    if os.path.exists(temp_file):
+        os.remove(temp_file)
+
+    return structure
+
 def u_to_cif(u, filename):
     import os
     temp_file = './temp.xyz'
